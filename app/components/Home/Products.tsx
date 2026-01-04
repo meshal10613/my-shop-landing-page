@@ -94,10 +94,10 @@ const products: ProductItems = [
 ];
 export default function Products({ title }: { title: string }) {
     return (
-        <div className="container mx-auto">
+        <div className="container mx-auto my-10">
             {/* Popular Products */}
             <div className="my-10">
-                <h2 className="text-xl lg:text-2xl font-semibold">{title}</h2>
+                <h2 className="text-xl lg:text-2xl font-semibold mb-10">{title}</h2>
                 <div className="grid grid-cols-2 md:gric-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-5">
                     {products.map((product) => (
                         <div
