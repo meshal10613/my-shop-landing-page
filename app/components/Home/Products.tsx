@@ -10,6 +10,7 @@ import img8 from "@/app/assets/category8.png";
 import img9 from "@/app/assets/category9.png";
 import img10 from "@/app/assets/category10.png";
 import Image, { StaticImageData } from "next/image";
+import { FaRegHeart } from "react-icons/fa";
 
 type ProductItems = {
     id: number;
@@ -91,20 +92,23 @@ const products: ProductItems = [
         discountedPrice: 1200,
     },
 ];
-export default function Products({title}: {title: string}) {
+export default function Products({ title }: { title: string }) {
     return (
         <div className="container mx-auto">
             {/* Popular Products */}
             <div className="my-10">
-                <h2 className="text-xl lg:text-2xl font-semibold">
-                    {title}
-                </h2>
-                <div className="grid grid-cols-2 lg:gric-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
+                <h2 className="text-xl lg:text-2xl font-semibold">{title}</h2>
+                <div className="grid grid-cols-2 md:gric-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-5">
                     {products.map((product) => (
                         <div
                             key={product.id}
-                            className="bg-white shadow-xl p-3 max-w-60 mx-auto space-y-3 h-full flex flex-col"
+                            className="bg-white shadow-xl p-3 max-w-60 mx-auto space-y-3 h-full flex flex-col relative"
                         >
+                            <FaRegHeart
+                                size={20}
+                                className="text-gray-400 absolute top-2 right-2 cursor-pointer hover:text-red-500"
+                            />
+
                             <div className="h-36 flex items-center justify-center overflow-hidden">
                                 <Image
                                     src={product.image}
