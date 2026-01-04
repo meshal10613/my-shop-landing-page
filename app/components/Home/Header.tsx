@@ -13,7 +13,7 @@ import { FiUser } from "react-icons/fi";
 import { BiCategory } from "react-icons/bi";
 import { IoIosArrowDown } from "react-icons/io";
 
-export default function Header() {
+export default function Header({cart}: {cart: number}) {
     return (
         <div className="container mx-auto">
             <div className="flex lg:hidden items-center justify-between px-6 bg-primary py-4">
@@ -101,7 +101,7 @@ export default function Header() {
                         <div className="relative">
                             <FaRegHeart className="w-5 h-5 md:w-6 md:h-6" />
                             <span className="absolute -right-3 -top-3 bg-primary text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                                5
+                                0
                             </span>
                         </div>
                         <span className="text-xs hidden lg:block">
@@ -112,7 +112,7 @@ export default function Header() {
                         <div className="relative">
                             <BsCart3 className="w-5 h-5 md:w-6 md:h-6" />
                             <span className="absolute -right-3 -top-3 bg-primary text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                                5
+                                {cart}
                             </span>
                         </div>
                         <span className="text-xs hidden lg:block">Cart</span>

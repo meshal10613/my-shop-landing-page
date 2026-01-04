@@ -92,12 +92,22 @@ const products: ProductItems = [
         discountedPrice: 1200,
     },
 ];
-export default function Products({ title }: { title: string }) {
+export default function Products({
+    title,
+    cart,
+    setCart,
+}: {
+    title: string;
+    cart: number;
+    setCart: React.Dispatch<React.SetStateAction<number>>;
+}) {
     return (
         <div className="container mx-auto my-10">
             {/* Popular Products */}
             <div className="my-10">
-                <h2 className="text-xl lg:text-2xl font-semibold mb-10">{title}</h2>
+                <h2 className="text-xl lg:text-2xl font-semibold mb-10">
+                    {title}
+                </h2>
                 <div className="grid grid-cols-2 md:gric-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-5">
                     {products.map((product) => (
                         <div
@@ -126,7 +136,10 @@ export default function Products({ title }: { title: string }) {
                                 {product.title}
                             </p>
                             <div className="flex items-center gap-3">
-                                <button className="btn btn-sm border-2 border-primary text-primary transition-all hover:border-none hover:bg-primary hover:text-white hover:scale-110">
+                                <button
+                                    onClick={() => setCart(cart + 1)}
+                                    className="btn btn-sm border-2 border-primary text-primary transition-all hover:border-none hover:bg-primary hover:text-white hover:scale-110"
+                                >
                                     Add To Cart
                                 </button>
                                 <button className="btn btn-sm transition-all border-none bg-primary text-white hover:scale-110">
