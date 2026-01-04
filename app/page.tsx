@@ -1,9 +1,12 @@
 import Header from "./components/Home/Header";
+import Products from "./components/Home/Products";
 
 export default function Home() {
     return (
         <div className="max-w-324 mx-auto">
             <Header />
+            <Products title="Popular Products"/>
+            <Products title="All Products"/>
         </div>
     );
 }
