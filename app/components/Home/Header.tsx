@@ -12,8 +12,9 @@ import { BsCart3 } from "react-icons/bs";
 import { FiUser } from "react-icons/fi";
 import { BiCategory } from "react-icons/bi";
 import { IoIosArrowDown } from "react-icons/io";
+import Link from "next/link";
 
-export default function Header({cart}: {cart: number}) {
+export default function Header() {
     return (
         <div className="container mx-auto">
             <div className="flex lg:hidden items-center justify-between px-6 bg-primary py-4">
@@ -36,10 +37,17 @@ export default function Header({cart}: {cart: number}) {
                     />
                 </div>
 
-				<div className="relative">
-					<input type="text" className="input h-7 border-none focus:border-none focus:outline-none" placeholder="Search here..." />
-					<GoSearch size={20} className="text-gray-400 cursor-pointer absolute top-1/4 right-2" />
-				</div>
+                <div className="relative">
+                    <input
+                        type="text"
+                        className="input h-7 border-none focus:border-none focus:outline-none"
+                        placeholder="Search here..."
+                    />
+                    <GoSearch
+                        size={20}
+                        className="text-gray-400 cursor-pointer absolute top-1/4 right-2"
+                    />
+                </div>
             </div>
 
             <div className="flex items-center justify-between px-3 md:px-6 lg:px-0 py-5">
@@ -73,11 +81,13 @@ export default function Header({cart}: {cart: number}) {
                             </ul>
                         </div>
                     </div>
-                    <Image
-                        src={logo}
-                        alt="logo"
-                        className="w-30 md:w-40 h-auto object-contain cursor-pointer"
-                    />
+                    <Link href={`/`}>
+                        <Image
+                            src={logo}
+                            alt="logo"
+                            className="w-30 md:w-40 h-auto object-contain cursor-pointer"
+                        />
+                    </Link>
                 </div>
 
                 <div className="hidden lg:block mx-auto min-w-92">
@@ -112,7 +122,7 @@ export default function Header({cart}: {cart: number}) {
                         <div className="relative">
                             <BsCart3 className="w-5 h-5 md:w-6 md:h-6" />
                             <span className="absolute -right-3 -top-3 bg-primary text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                                {cart}
+                                0
                             </span>
                         </div>
                         <span className="text-xs hidden lg:block">Cart</span>
@@ -138,12 +148,12 @@ export default function Header({cart}: {cart: number}) {
                     </div>
                     <ul className="flex items-center gap-5">
                         <li>
-                            <a href="" className="hover:text-primary">
+                            <Link href="/" className="hover:text-primary">
                                 Home
-                            </a>
+                            </Link>
                         </li>
                         <li>
-                            <a href="" className="hover:text-primary">
+                            <a href="/shop" className="hover:text-primary">
                                 Shop
                             </a>
                         </li>

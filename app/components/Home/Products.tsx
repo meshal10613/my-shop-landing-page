@@ -20,7 +20,7 @@ type ProductItems = {
     discountedPrice: number;
 }[];
 
-const products: ProductItems = [
+export const products: ProductItems = [
     {
         id: 1,
         title: "Seeds of Change Organic Quinoa, Brown, & Red Rice",
@@ -94,12 +94,8 @@ const products: ProductItems = [
 ];
 export default function Products({
     title,
-    cart,
-    setCart,
 }: {
     title: string;
-    cart: number;
-    setCart: React.Dispatch<React.SetStateAction<number>>;
 }) {
     return (
         <div className="container mx-auto my-10">
@@ -137,7 +133,6 @@ export default function Products({
                             </p>
                             <div className="flex items-center gap-3">
                                 <button
-                                    onClick={() => setCart(cart + 1)}
                                     className="btn btn-sm border-2 border-primary text-primary transition-all hover:border-none hover:bg-primary hover:text-white hover:scale-110"
                                 >
                                     Add To Cart
