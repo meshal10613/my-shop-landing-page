@@ -2,10 +2,14 @@
 
 import React, { useState } from "react";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-import { products } from "./Products";
+import { products } from "./Home/Products";
 import Image from "next/image";
 import { FaRegHeart } from "react-icons/fa";
-import { MdKeyboardDoubleArrowLeft, MdKeyboardDoubleArrowRight } from "react-icons/md";
+import {
+    MdKeyboardDoubleArrowLeft,
+    MdKeyboardDoubleArrowRight,
+} from "react-icons/md";
+import Link from "next/link";
 
 export default function ShopProducts() {
     const [sortOpen, setSortOpen] = useState(false);
@@ -142,11 +146,13 @@ export default function ShopProducts() {
                             />
 
                             <div className="h-36 flex items-center justify-center overflow-hidden">
-                                <Image
-                                    src={product.image}
-                                    alt={`image-${product.id}`}
-                                    className="w-34 lg:w-37 h-auto mx-auto transition-all hover:scale-110 cursor-pointer"
-                                />
+                                <Link href={`/products/${product.id}`}>
+                                    <Image
+                                        src={product.image}
+                                        alt={`image-${product.id}`}
+                                        className="w-34 lg:w-37 h-auto mx-auto transition-all hover:scale-110 cursor-pointer"
+                                    />
+                                </Link>
                             </div>
                             <h2 className="text-[14px] md:text-xl font-semibold text-primary">
                                 BDT {product.discountedPrice}{" "}
@@ -170,16 +176,33 @@ export default function ShopProducts() {
                 </div>
             </div>
 
-			<div className="flex items-center justify-end gap-2 my-10">
-				<div className="flex items-center p-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer"><MdKeyboardDoubleArrowLeft />Preveous</div>
-				<div className="px-3 py-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer">1</div>
-				<div className="px-3 py-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer">2</div>
-				<div className="px-3 py-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer">3</div>
-				<div className="px-3 py-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer">4</div>
-				<div className="px-3 py-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer">5</div>
-				<div className="px-3 py-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer">6</div>
-				<div className="flex items-center p-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer"><MdKeyboardDoubleArrowRight /> Next</div>
-			</div>
+            <div className="flex items-center justify-end gap-2 my-10">
+                <div className="flex items-center p-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer">
+                    <MdKeyboardDoubleArrowLeft />
+                    Preveous
+                </div>
+                <div className="px-3 py-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer">
+                    1
+                </div>
+                <div className="px-3 py-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer">
+                    2
+                </div>
+                <div className="px-3 py-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer">
+                    3
+                </div>
+                <div className="px-3 py-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer">
+                    4
+                </div>
+                <div className="px-3 py-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer">
+                    5
+                </div>
+                <div className="px-3 py-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer">
+                    6
+                </div>
+                <div className="flex items-center p-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer">
+                    <MdKeyboardDoubleArrowRight /> Next
+                </div>
+            </div>
         </div>
     );
 }

@@ -11,6 +11,7 @@ import img9 from "@/app/assets/category9.png";
 import img10 from "@/app/assets/category10.png";
 import Image, { StaticImageData } from "next/image";
 import { FaRegHeart } from "react-icons/fa";
+import Link from "next/link";
 
 type ProductItems = {
     id: number;
@@ -92,11 +93,7 @@ export const products: ProductItems = [
         discountedPrice: 1200,
     },
 ];
-export default function Products({
-    title,
-}: {
-    title: string;
-}) {
+export default function Products({ title }: { title: string }) {
     return (
         <div className="container mx-auto my-10">
             {/* Popular Products */}
@@ -116,11 +113,13 @@ export default function Products({
                             />
 
                             <div className="h-36 flex items-center justify-center overflow-hidden">
-                                <Image
-                                    src={product.image}
-                                    alt={`image-${product.id}`}
-                                    className="w-34 lg:w-37 h-auto mx-auto transition-all hover:scale-110 cursor-pointer"
-                                />
+                                <Link href={`/products/${product.id}`}>
+                                    <Image
+                                        src={product.image}
+                                        alt={`image-${product.id}`}
+                                        className="w-34 lg:w-37 h-auto mx-auto transition-all hover:scale-110 cursor-pointer"
+                                    />
+                                </Link>
                             </div>
                             <h2 className="text-[14px] md:text-xl font-semibold text-primary">
                                 BDT {product.discountedPrice}{" "}
@@ -132,9 +131,7 @@ export default function Products({
                                 {product.title}
                             </p>
                             <div className="flex items-center gap-3">
-                                <button
-                                    className="btn btn-sm border-2 border-primary text-primary transition-all hover:border-none hover:bg-primary hover:text-white hover:scale-110"
-                                >
+                                <button className="btn btn-sm border-2 border-primary text-primary transition-all hover:border-none hover:bg-primary hover:text-white hover:scale-110">
                                     Add To Cart
                                 </button>
                                 <button className="btn btn-sm transition-all border-none bg-primary text-white hover:scale-110">
