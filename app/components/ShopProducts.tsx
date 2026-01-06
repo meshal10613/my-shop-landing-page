@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-import { products } from "./Home/Products";
 import Image from "next/image";
 import { FaRegHeart } from "react-icons/fa";
 import {
@@ -10,8 +9,11 @@ import {
     MdKeyboardDoubleArrowRight,
 } from "react-icons/md";
 import Link from "next/link";
+import { ProductsType } from "./Home/Products";
 
 export default function ShopProducts() {
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPage, setTotalPage] = useState(20);
     const [sortOpen, setSortOpen] = useState(false);
     const [filterOpen, setFilterOpen] = useState(false);
     const [selectedSort, setSelectedSort] = useState("Price Low To High");
@@ -24,6 +26,54 @@ export default function ShopProducts() {
         "BDT 501 - BDT 1500",
         "BDT 2501 - BDT 5000",
     ];
+    const [products, setProducts] = useState<ProductsType[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const res = await fetch(
+                    `https://server-homeshopbd-2-kohl.vercel.app/api/v1/product?page=${currentPage}&limit=12`
+                );
+
+                if (!res.ok) {
+                    throw new Error("Failed to fetch categories");
+                }
+
+                const data = await res.json();
+
+                setProducts(
+                    Array.isArray(data.data?.products) ? data.data.products : []
+                );
+                setTotalPage(data.data.page);
+            } catch (err) {
+                console.log(err);
+                setError("Something went wrong");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCategories();
+    }, [currentPage]);
+
+    if (loading)
+        return <span className="loading loading-spinner loading-md"></span>;
+    if (error) return <p>{error}</p>;
+
+    const handlePrevious = (page: number) => {
+        if (page > 1) {
+            setCurrentPage(page - 1);
+        }
+    };
+
+    const handleNext = (page: number) => {
+        if (page < totalPage) {
+            setCurrentPage(page + 1);
+        }
+    };
+
     return (
         <div className="my-10 container mx-auto">
             <h2 className="text-xl lg:text-2xl font-semibold mb-10">
@@ -137,7 +187,7 @@ export default function ShopProducts() {
                 <div className="flex-1 grid grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-2 xl:gap-5 w-fit mx-auto">
                     {products.map((product) => (
                         <div
-                            key={product.id}
+                            key={product._id}
                             className="bg-white shadow-xl p-3 max-w-60 mx-auto space-y-3 h-full flex flex-col relative"
                         >
                             <FaRegHeart
@@ -146,22 +196,24 @@ export default function ShopProducts() {
                             />
 
                             <div className="h-36 flex items-center justify-center overflow-hidden">
-                                <Link href={`/products/${product.id}`}>
+                                <Link href={`/products/${product._id}`}>
                                     <Image
-                                        src={product.image}
-                                        alt={`image-${product.id}`}
-                                        className="w-34 lg:w-37 h-auto mx-auto transition-all hover:scale-110 cursor-pointer"
+                                        src={product.imageURLs?.[0]}
+                                        alt={`image-${product._id}`}
+                                        width={150}
+                                        height={150}
+                                        className="mx-auto transition-all hover:scale-110 cursor-pointer object-cover"
                                     />
                                 </Link>
                             </div>
                             <h2 className="text-[14px] md:text-xl font-semibold text-primary">
-                                BDT {product.discountedPrice}{" "}
+                                BDT {product.salePrice}{" "}
                                 <span className="text-gray-400 line-through">
-                                    BDT{product.basePrice}
+                                    BDT{product.productPrice}
                                 </span>
                             </h2>
                             <p className="text-[10px] md:text-xs lg:text-[14px] font-semibold">
-                                {product.title}
+                                {product.name}
                             </p>
                             <div className="flex items-center gap-3">
                                 <button className="btn btn-sm border-2 border-primary text-primary transition-all hover:border-none hover:bg-primary hover:text-white hover:scale-110">
@@ -177,29 +229,29 @@ export default function ShopProducts() {
             </div>
 
             <div className="flex items-center justify-end gap-2 my-10">
-                <div className="flex items-center p-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer">
+                <div onClick={() => handlePrevious(currentPage)} className="flex items-center p-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer">
                     <MdKeyboardDoubleArrowLeft />
-                    Preveous
+                    Previous
                 </div>
-                <div className="px-3 py-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer">
-                    1
-                </div>
-                <div className="px-3 py-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer">
-                    2
-                </div>
-                <div className="px-3 py-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer">
-                    3
-                </div>
-                <div className="px-3 py-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer">
-                    4
-                </div>
-                <div className="px-3 py-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer">
-                    5
-                </div>
-                <div className="px-3 py-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer">
-                    6
-                </div>
-                <div className="flex items-center p-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer">
+                {Array.from({ length: totalPage }, (_, i) => i + 1).map(
+                    (page) => (
+                        <div
+                            key={page}
+                            onClick={() => setCurrentPage(page)}
+                            className={`
+                            px-3 py-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer
+                            ${
+                                page === currentPage
+                                    ? "bg-primary text-black"
+                                    : "bg-white"
+                            }
+                        `}
+                        >
+                            {page}
+                        </div>
+                    )
+                )}
+                <div onClick={() => handleNext(currentPage)} className="flex items-center p-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer">
                     <MdKeyboardDoubleArrowRight /> Next
                 </div>
             </div>

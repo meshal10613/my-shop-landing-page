@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 
-export default function AddReview() {
+export default function AddReview({ id }: { id: string }) {
     const [rating, setRating] = useState(0);
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -10,7 +10,12 @@ export default function AddReview() {
         const form = e.target as HTMLFormElement;
         const formData = new FormData(form);
         const data = Object.fromEntries(formData);
-        console.log(data);
+        
+		const reviewData = {
+			id,
+			...data,
+		};
+		console.log(reviewData)
     };
     return (
         <div className="space-y-5 w-full mx-auto">

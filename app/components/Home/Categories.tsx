@@ -1,27 +1,10 @@
 "use client";
 
-import React from "react";
-import p1 from "@/app/assets/p1.png";
-import p2 from "@/app/assets/p2.png";
-import p3 from "@/app/assets/p3.png";
-import p4 from "@/app/assets/p4.png";
-import p5 from "@/app/assets/p5.png";
-import p6 from "@/app/assets/p6.png";
-import p7 from "@/app/assets/p7.png";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
-
-
-const categories = [
-    { id: 1, image: p1, name: "Fruits" },
-    { id: 2, image: p2, name: "Vegitables" },
-    { id: 3, image: p3, name: "Food & Chips" },
-    { id: 4, image: p4, name: "Dairy Goods" },
-    { id: 5, image: p5, name: "Meals" },
-    { id: 6, image: p6, name: "Fish & Seafoods" },
-    { id: 7, image: p7, name: "Tea & Coffe" },
-];
+import { StaticImport } from "next/dist/shared/lib/get-img-props";
 
 const responsive = {
     "2xl": { breakpoint: { max: 4000, min: 1536 }, items: 7 },
@@ -31,7 +14,51 @@ const responsive = {
     sm: { breakpoint: { max: 463, min: 0 }, items: 3 },
 };
 
+type CategoriesType = {
+    _id: string;
+    parentCategory: string;
+    childCategory: string[];
+    imageURLs: string[] | StaticImport[];
+    imageURLs2?: string[];
+    status: boolean;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+};
+
 export default function Categories() {
+    const [categories, setCategories] = useState<CategoriesType[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const res = await fetch(
+                    "https://server-homeshopbd-2-kohl.vercel.app/api/v1/category"
+                );
+
+                if (!res.ok) {
+                    throw new Error("Failed to fetch categories");
+                }
+
+                const data = await res.json();
+
+                setCategories(Array.isArray(data.data?.result) ? data.data.result : []);
+            } catch (err) {
+                console.log(err)
+                setError("Something went wrong");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCategories();
+    }, []);
+
+    if (loading) return <span className="loading loading-spinner loading-md"></span>;
+    if (error) return <p>{error}</p>;
+    console.log(categories)
     return (
         <section className="my-10">
             <div className="container mx-auto px-4">
@@ -52,28 +79,26 @@ export default function Categories() {
                     containerClass="pb-8"
                     itemClass="px-4"
                 >
-                    {categories.map((category) => (
+                    {categories?.map((category: CategoriesType) => (
                         <div
-                            key={category.id}
+                            key={category._id}
                             className="text-center group cursor-pointer bg-white shadow-xl py-5"
                         >
                             <div className="relative w-20 h-20 mx-auto mb-4 overflow-hiddenshadow-xl transition-all duration-300 group-hover:scale-110">
                                 <Image
-                                    src={category.image}
-                                    alt={category.name}
+                                    src={category.imageURLs[0]}
+                                    alt={category.parentCategory}
                                     fill
                                     className="object-cover"
                                 />
                             </div>
-                            <p className="text-lg text-gray-400 group-hover:text-primary transition-colors">
-                                {category.name}
+                            <p className="text-base text-gray-400 group-hover:text-primary transition-colors">
+                                {category.parentCategory}
                             </p>
                         </div>
                     ))}
                 </Carousel>
             </div>
-
-
         </section>
     );
 }
