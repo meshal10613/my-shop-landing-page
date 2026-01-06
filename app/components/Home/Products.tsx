@@ -23,7 +23,7 @@ export type ProductsType = {
     discount: number;
     brand: string;
     tags: string[];
-    imageURLs: string[] | StaticImport[];
+    imageURLs?: string[] | StaticImport[] | undefined;
     youtube?: string;
     size: string[];
     ratingValue: number;
@@ -93,7 +93,7 @@ export default function Products({ title }: { title: string }) {
                             <div className="h-36 flex items-center justify-center overflow-hidden">
                                 <Link href={`/products/${product._id}`}>
                                     <Image
-                                        src={product.imageURLs?.[0]}
+                                        src={product.imageURLs?.[0] ? product.imageURLs[0] : ""}
                                         alt={`image-${product._id}`}
                                         width={150}
                                         height={150}
