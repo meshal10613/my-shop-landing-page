@@ -10,16 +10,24 @@ import {
 } from "react-icons/md";
 import Link from "next/link";
 import { ProductsType } from "./Home/Products";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/store";
+import { addToCart } from "@/store/slice/cartSlice";
 
 export default function ShopProducts() {
+    const dispatch = useDispatch<AppDispatch>();
+
     const [currentPage, setCurrentPage] = useState(1);
-    const [totalPage, setTotalPage] = useState(20);
+    const [totalPage, setTotalPage] = useState(0);
     const [sortOpen, setSortOpen] = useState(false);
     const [filterOpen, setFilterOpen] = useState(false);
     const [selectedSort, setSelectedSort] = useState("Price Low To High");
     const [selectedFilter, setSelectedFilter] = useState("BDT 0 - BDT 500");
 
-    const sortOptions = ["Price Low To High", "Price High To Low"];
+    const sortOptions = [
+        { label: "Price Low To High", value: "asc" },
+        { label: "Price High To Low", value: "desc" },
+    ];
     const filterOptions = [
         "BDT 0 - BDT 500",
         "BDT 501 - BDT 1500",
@@ -27,40 +35,24 @@ export default function ShopProducts() {
         "BDT 2501 - BDT 5000",
     ];
     const [products, setProducts] = useState<ProductsType[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
     useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const res = await fetch(
-                    `https://server-homeshopbd-2-kohl.vercel.app/api/v1/product?page=${currentPage}&limit=12`
-                );
-
-                if (!res.ok) {
-                    throw new Error("Failed to fetch categories");
-                }
-
-                const data = await res.json();
-
-                setProducts(
-                    Array.isArray(data.data?.products) ? data.data.products : []
-                );
-                setTotalPage(data.data.page);
-            } catch (err) {
-                console.log(err);
-                setError("Something went wrong");
-            } finally {
-                setLoading(false);
+        fetch(
+            `https://ecommerce-saas-server-wine.vercel.app/api/v1/product/website?limit=10&page=${currentPage}`,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "store-id": `0000121`,
+                },
             }
-        };
-
-        fetchCategories();
+        )
+            .then((res) => res.json())
+            .then((data) => {
+                setProducts(data.data.data);
+                // setTotalPage(data.data.meta.page);
+                setTotalPage(2);
+            })
+            .catch((err) => console.error("Failed to fetch categories:", err));
     }, [currentPage]);
-
-    if (loading)
-        return <span className="loading loading-spinner loading-md"></span>;
-    if (error) return <p>{error}</p>;
 
     const handlePrevious = (page: number) => {
         if (page > 1) {
@@ -107,20 +99,20 @@ export default function ShopProducts() {
                                     className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full mt-1 z-10"
                                 >
                                     {sortOptions.map((option) => (
-                                        <li key={option}>
+                                        <li key={option.label}>
                                             <a
                                                 onClick={(e) => {
                                                     e.preventDefault();
-                                                    setSelectedSort(option);
+                                                    setSelectedSort(option.label);
                                                     setSortOpen(false);
                                                 }}
                                                 className={
-                                                    selectedSort === option
+                                                    selectedSort === option.label
                                                         ? "active"
                                                         : ""
                                                 }
                                             >
-                                                {option}
+                                                {option.label}
                                             </a>
                                         </li>
                                     ))}
@@ -198,7 +190,11 @@ export default function ShopProducts() {
                             <div className="h-36 flex items-center justify-center overflow-hidden">
                                 <Link href={`/products/${product._id}`}>
                                     <Image
-                                        src={product.imageURLs?.[0]}
+                                        src={
+                                            product.imageURLs?.[0]
+                                                ? product.imageURLs?.[0]
+                                                : ""
+                                        }
                                         alt={`image-${product._id}`}
                                         width={150}
                                         height={150}
@@ -216,12 +212,12 @@ export default function ShopProducts() {
                                 {product.name}
                             </p>
                             <div className="flex items-center gap-3">
-                                <button className="btn btn-sm border-2 border-primary text-primary transition-all hover:border-none hover:bg-primary hover:text-white hover:scale-110">
+                                <button onClick={() => dispatch(addToCart(product._id))} className="btn btn-sm border-2 border-primary text-primary transition-all hover:border-none hover:bg-primary hover:text-white hover:scale-110">
                                     Add To Cart
                                 </button>
-                                <button className="btn btn-sm transition-all border-none bg-primary text-white hover:scale-110">
+                                <Link href={`/products/${product._id}`} className="btn btn-sm transition-all border-none bg-primary text-white hover:scale-110">
                                     Order Now
-                                </button>
+                                </Link>
                             </div>
                         </div>
                     ))}
@@ -229,7 +225,10 @@ export default function ShopProducts() {
             </div>
 
             <div className="flex items-center justify-end gap-2 my-10">
-                <div onClick={() => handlePrevious(currentPage)} className="flex items-center p-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer">
+                <div
+                    onClick={() => handlePrevious(currentPage)}
+                    className="flex items-center p-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer"
+                >
                     <MdKeyboardDoubleArrowLeft />
                     Previous
                 </div>
@@ -251,7 +250,10 @@ export default function ShopProducts() {
                         </div>
                     )
                 )}
-                <div onClick={() => handleNext(currentPage)} className="flex items-center p-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer">
+                <div
+                    onClick={() => handleNext(currentPage)}
+                    className="flex items-center p-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer"
+                >
                     <MdKeyboardDoubleArrowRight /> Next
                 </div>
             </div>

@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import logo from "@/app/assets/logo.png";
 import { GoSearch } from "react-icons/go";
@@ -13,8 +15,14 @@ import { FiUser } from "react-icons/fi";
 import { BiCategory } from "react-icons/bi";
 import { IoIosArrowDown } from "react-icons/io";
 import Link from "next/link";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 export default function Header() {
+    const cart = useSelector((state: RootState) => state.cart.items);
+    const totalCount = cart.reduce((sum, item) => sum + item.count, 0);
+
+
     return (
         <div className="container mx-auto">
             <div className="flex lg:hidden items-center justify-between px-6 bg-primary py-4">
@@ -122,7 +130,7 @@ export default function Header() {
                         <div className="relative">
                             <BsCart3 className="w-5 h-5 md:w-6 md:h-6" />
                             <span className="absolute -right-3 -top-3 bg-primary text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                                0
+                                {totalCount}
                             </span>
                         </div>
                         <span className="text-xs hidden lg:block">Cart</span>

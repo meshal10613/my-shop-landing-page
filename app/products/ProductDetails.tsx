@@ -13,46 +13,46 @@ import { ProductsType } from "../components/Home/Products";
 import { BiChevronLeft, BiChevronRight } from "react-icons/bi";
 
 export default function ProductDetails({ id }: { id: string }) {
+    const [count, setcount] = useState(0);
     const [product, setProduct] = useState<ProductsType | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-	const [img, setImg] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const res = await fetch(
-                    `https://server-homeshopbd-2-kohl.vercel.app/api/v1/product/${id}`
-                );
-
-                if (!res.ok) {
-                    throw new Error("Failed to fetch product");
-                }
-
-                const data = await res.json();
-                setProduct(data.data);
-				setImg(data.data.imageURLs[0]);
-            } catch (err) {
-                console.log(err);
-                setError("Something went wrong");
-            } finally {
-                setLoading(false);
+        fetch(
+            `https://ecommerce-saas-server-wine.vercel.app/api/v1/product/${id}`,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "store-id": `0000121`,
+                },
             }
-        };
-
-        fetchCategories();
+        )
+            .then((res) => res.json())
+            .then((data) => setProduct(data.data))
+            .catch((err) => console.error("Failed to fetch categories:", err));
     }, [id]);
 
-    if (loading)
-        return <span className="loading loading-spinner loading-md"></span>;
-    if (error) return <p>{error}</p>;
+    const handleMinus = (c: number) => {
+        if (c === 0) return;
+        setcount(c - 1);
+    };
+
+    const handlePlus = (c: number) => {
+        setcount(c + 1);
+    };
+
+    const handleOrder = (id: string) => {
+        if(count === 0) return;
+        
+        console.log({id, count})
+    };
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mx-5 lg:mx-auto items-center">
             <div className="flex flex-col overflow-hidden">
                 <div className="relative bg-white rounded-xl overflow-hidden">
                     <div className="relative flex items-center justify-center">
                         <Image
-                            src={img ? img : ""}
+                            src={product?.imageURLs?.[0] || "/app/assets/a1.png"}
                             alt="Main product display"
 							width={400}
 							height={400}
@@ -68,7 +68,7 @@ export default function ProductDetails({ id }: { id: string }) {
                         </button>
                     </div>
                 </div>
-				<div className="grid grid-cols-4 gap-4">
+				{/* <div className="grid grid-cols-4 gap-4">
 					{
 						product?.imageURLs?.map((img, index) => (
 							<div key={index} className="relative bg-white rounded-xl overflow-hidden">
@@ -85,7 +85,7 @@ export default function ProductDetails({ id }: { id: string }) {
 							</div>
 						))
 					}
-				</div>
+				</div> */}
             </div>
             <div className="space-y-5">
                 <p className="badge bg-[#D8F1E5] font-semibold text-primary p-3 rounded-3xl">
@@ -130,16 +130,16 @@ export default function ProductDetails({ id }: { id: string }) {
                 </div>
                 <p className="text-gray-400">{product?.description}</p>
                 <div className="flex items-center gap-2">
-                    <button className="btn btn-lg btn-primary text-white transition-all duration-300 hover:scale-110">
+                    <button onClick={() => handleOrder(product?._id as string)} className="btn btn-lg btn-primary text-white transition-all duration-300 hover:scale-110">
                         <BsCart3 />
                         Order Now
                     </button>
                     <div className="border border-gray-300 rounded-md p-4 flex items-center gap-5">
-                        <h2 className="w-7 h-7 rounded-full bg-orange-400 text-white flex items-center justify-center text-xl cursor-pointer">
+                        <h2 onClick={() => {handleMinus(count)}} className="w-7 h-7 rounded-full bg-[#DFDFDF] text-white flex items-center justify-center text-xl cursor-pointer">
                             -
                         </h2>
-                        <h2>2</h2>
-                        <h2 className="w-7 h-7 rounded-full text-white bg-orange-400 flex items-center justify-center text-xl cursor-pointer">
+                        <h2>{count}</h2>
+                        <h2 onClick={() => {handlePlus(count)}} className="w-7 h-7 rounded-full text-white bg-orange-400 flex items-center justify-center text-xl cursor-pointer">
                             +
                         </h2>
                     </div>

@@ -5,6 +5,9 @@ import Image from "next/image";
 import { FaRegHeart } from "react-icons/fa";
 import Link from "next/link";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/store";
+import { addToCart } from "@/store/slice/cartSlice";
 
 export type ProductsType = {
     _id: string;
@@ -23,7 +26,7 @@ export type ProductsType = {
     discount: number;
     brand: string;
     tags: string[];
-    imageURLs?: string[] | StaticImport[] | undefined;
+    imageURLs: (string | StaticImport)[];
     youtube?: string;
     size: string[];
     ratingValue: number;
@@ -39,40 +42,24 @@ export type ProductsType = {
 };
 
 export default function Products({ title }: { title: string }) {
+    const dispatch = useDispatch<AppDispatch>();
+
     const [products, setProducts] = useState<ProductsType[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
     useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const res = await fetch(
-                    "https://server-homeshopbd-2-kohl.vercel.app/api/v1/product?page=1&limit=10"
-                );
-
-                if (!res.ok) {
-                    throw new Error("Failed to fetch categories");
-                }
-
-                const data = await res.json();
-
-                setProducts(
-                    Array.isArray(data.data?.products) ? data.data.products : []
-                );
-            } catch (err) {
-                console.log(err);
-                setError("Something went wrong");
-            } finally {
-                setLoading(false);
+        fetch(
+            "https://ecommerce-saas-server-wine.vercel.app/api/v1/product/website",
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "store-id": `0000121`,
+                },
             }
-        };
-
-        fetchCategories();
+        )
+            .then((res) => res.json())
+            .then((data) => setProducts(data.data.data))
+            .catch((err) => console.error("Failed to fetch categories:", err));
     }, []);
 
-    if (loading)
-        return <span className="loading loading-spinner loading-md"></span>;
-    if (error) return <p>{error}</p>;
     return (
         <div className="container mx-auto my-10">
             <div className="my-10">
@@ -111,12 +98,12 @@ export default function Products({ title }: { title: string }) {
                                 {product.name}
                             </p>
                             <div className="flex items-center gap-3">
-                                <button className="btn btn-sm border-2 border-primary text-primary transition-all hover:border-none hover:bg-primary hover:text-white hover:scale-110">
+                                <button onClick={() => dispatch(addToCart(product._id))} className="btn btn-sm border-2 border-primary text-primary transition-all hover:border-none hover:bg-primary hover:text-white hover:scale-110">
                                     Add To Cart
                                 </button>
-                                <button className="btn btn-sm transition-all border-none bg-primary text-white hover:scale-110">
+                                <Link href={`/products/${product._id}`} className="btn btn-sm transition-all border-none bg-primary text-white hover:scale-110">
                                     Order Now
-                                </button>
+                                </Link>
                             </div>
                         </div>
                     ))}
