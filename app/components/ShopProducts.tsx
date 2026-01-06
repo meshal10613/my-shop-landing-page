@@ -212,7 +212,7 @@ export default function ShopProducts() {
                                 {product.name}
                             </p>
                             <div className="flex items-center gap-3">
-                                <button onClick={() => dispatch(addToCart(product._id))} className="btn btn-sm border-2 border-primary text-primary transition-all hover:border-none hover:bg-primary hover:text-white hover:scale-110">
+                                <button onClick={() => dispatch(addToCart(product))} className="btn btn-sm border-2 border-primary text-primary transition-all hover:border-none hover:bg-primary hover:text-white hover:scale-110">
                                     Add To Cart
                                 </button>
                                 <Link href={`/products/${product._id}`} className="btn btn-sm transition-all border-none bg-primary text-white hover:scale-110">

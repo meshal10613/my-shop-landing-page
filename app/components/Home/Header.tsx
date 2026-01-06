@@ -126,7 +126,7 @@ export default function Header() {
                             Wishlist
                         </span>
                     </div>
-                    <div className="flex items-center gap-2 cursor-pointer">
+                    <Link href={`/checkout`} className="flex items-center gap-2 cursor-pointer">
                         <div className="relative">
                             <BsCart3 className="w-5 h-5 md:w-6 md:h-6" />
                             <span className="absolute -right-3 -top-3 bg-primary text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
@@ -134,7 +134,7 @@ export default function Header() {
                             </span>
                         </div>
                         <span className="text-xs hidden lg:block">Cart</span>
-                    </div>
+                    </Link>
                     <div className="flex items-center gap-2 cursor-pointer">
                         <div>
                             <FiUser className="w-5 h-5 md:w-6 md:h-6" />

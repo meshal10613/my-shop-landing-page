@@ -11,8 +11,14 @@ import {
 } from "react-icons/fa";
 import { ProductsType } from "../components/Home/Products";
 import { BiChevronLeft, BiChevronRight } from "react-icons/bi";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/store";
+import { addToCartWithCount } from "@/store/slice/cartSlice";
+import { useRouter } from "next/navigation";
 
 export default function ProductDetails({ id }: { id: string }) {
+    const dispatch = useDispatch<AppDispatch>();
+    const router = useRouter();
     const [count, setcount] = useState(0);
     const [product, setProduct] = useState<ProductsType | null>(null);
 
@@ -40,10 +46,16 @@ export default function ProductDetails({ id }: { id: string }) {
         setcount(c + 1);
     };
 
-    const handleOrder = (id: string) => {
-        if(count === 0) return;
-        
-        console.log({id, count})
+    const handleOrder = (product: ProductsType) => {
+        if (count === 0) return;
+
+        dispatch(
+            addToCartWithCount({
+                product,
+                count,
+            })
+        );
+        router.push("/checkout");
     };
 
     return (
@@ -52,10 +64,12 @@ export default function ProductDetails({ id }: { id: string }) {
                 <div className="relative bg-white rounded-xl overflow-hidden">
                     <div className="relative flex items-center justify-center">
                         <Image
-                            src={product?.imageURLs?.[0] || "/app/assets/a1.png"}
+                            src={
+                                product?.imageURLs?.[0] || "/app/assets/a1.png"
+                            }
                             alt="Main product display"
-							width={400}
-							height={400}
+                            width={400}
+                            height={400}
                             className="object-contain p-8"
                             priority
                         />
@@ -68,7 +82,7 @@ export default function ProductDetails({ id }: { id: string }) {
                         </button>
                     </div>
                 </div>
-				{/* <div className="grid grid-cols-4 gap-4">
+                {/* <div className="grid grid-cols-4 gap-4">
 					{
 						product?.imageURLs?.map((img, index) => (
 							<div key={index} className="relative bg-white rounded-xl overflow-hidden">
@@ -130,16 +144,29 @@ export default function ProductDetails({ id }: { id: string }) {
                 </div>
                 <p className="text-gray-400">{product?.description}</p>
                 <div className="flex items-center gap-2">
-                    <button onClick={() => handleOrder(product?._id as string)} className="btn btn-lg btn-primary text-white transition-all duration-300 hover:scale-110">
+                    <button
+                        onClick={() => handleOrder(product as ProductsType)}
+                        className="btn btn-lg btn-primary text-white transition-all duration-300 hover:scale-110"
+                    >
                         <BsCart3 />
                         Order Now
                     </button>
                     <div className="border border-gray-300 rounded-md p-4 flex items-center gap-5">
-                        <h2 onClick={() => {handleMinus(count)}} className="w-7 h-7 rounded-full bg-[#DFDFDF] text-white flex items-center justify-center text-xl cursor-pointer">
+                        <h2
+                            onClick={() => {
+                                handleMinus(count);
+                            }}
+                            className="w-7 h-7 rounded-full bg-[#DFDFDF] text-white flex items-center justify-center text-xl cursor-pointer"
+                        >
                             -
                         </h2>
                         <h2>{count}</h2>
-                        <h2 onClick={() => {handlePlus(count)}} className="w-7 h-7 rounded-full text-white bg-orange-400 flex items-center justify-center text-xl cursor-pointer">
+                        <h2
+                            onClick={() => {
+                                handlePlus(count);
+                            }}
+                            className="w-7 h-7 rounded-full text-white bg-orange-400 flex items-center justify-center text-xl cursor-pointer"
+                        >
                             +
                         </h2>
                     </div>
