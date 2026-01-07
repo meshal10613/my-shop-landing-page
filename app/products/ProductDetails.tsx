@@ -58,7 +58,7 @@ export default function ProductDetails({ id }: { id: string }) {
                 count,
             })
         );
-        router.push("/cart");
+        router.push("/checkout");
     };
 
     return (

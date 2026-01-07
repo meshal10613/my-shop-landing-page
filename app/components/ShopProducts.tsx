@@ -26,22 +26,29 @@ export default function ShopProducts() {
     const [sortOpen, setSortOpen] = useState(false);
     const [filterOpen, setFilterOpen] = useState(false);
     const [selectedSort, setSelectedSort] = useState("Price Low To High");
-    const [selectedFilter, setSelectedFilter] = useState("BDT 0 - BDT 500");
+    const [selectedFilter, setSelectedFilter] = useState({
+        label: "BDT 0 - BDT 500",
+        min: 0,
+        max: 500,
+    });
 
     const sortOptions = [
         { label: "Price Low To High", value: "asc" },
         { label: "Price High To Low", value: "desc" },
     ];
     const filterOptions = [
-        "BDT 0 - BDT 500",
-        "BDT 501 - BDT 1500",
-        "BDT 501 - BDT 1500",
-        "BDT 2501 - BDT 5000",
+        { label: "BDT 0 - BDT 500", min: 0, max: 500 },
+        { label: "BDT 501 - BDT 1500", min: 501, max: 1500 },
+        { label: "BDT 1501 - BDT 2500", min: 1501, max: 2500 },
+        { label: "BDT 2501 - BDT 5000", min: 2501, max: 5000 },
     ];
+
     const [products, setProducts] = useState<ProductsType[]>([]);
     useEffect(() => {
         fetch(
-            `https://ecommerce-saas-server-wine.vercel.app/api/v1/product/website?limit=10&page=${currentPage}`,
+            `https://ecommerce-saas-server-wine.vercel.app/api/v1/product/website?limit=10&page=${currentPage}&sortBy=salePrice&sortOrder=${
+                selectedSort === "Price Low To High" ? "asc" : "desc"
+            }&minPrice=${selectedFilter.min}&maxPrice=${selectedFilter.max}`,
             {
                 headers: {
                     "Content-Type": "application/json",
@@ -52,11 +59,10 @@ export default function ShopProducts() {
             .then((res) => res.json())
             .then((data) => {
                 setProducts(data.data.data);
-                // setTotalPage(data.data.meta.page);
-                setTotalPage(2);
+                setTotalPage(data.data.meta.page);
             })
             .catch((err) => console.error("Failed to fetch categories:", err));
-    }, [currentPage]);
+    }, [currentPage, selectedSort, selectedFilter]);
 
     const handlePrevious = (page: number) => {
         if (page > 1) {
@@ -148,7 +154,7 @@ export default function ShopProducts() {
                                     role="button"
                                     className="btn w-full justify-between text-left normal-case font-normal"
                                 >
-                                    <span>{selectedFilter}</span>
+                                    <span>{selectedFilter.label}</span>
                                     {filterOpen ? (
                                         <IoIosArrowUp />
                                     ) : (
@@ -161,7 +167,7 @@ export default function ShopProducts() {
                                         className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full mt-1 z-10 max-h-60 overflow-auto"
                                     >
                                         {filterOptions.map((option) => (
-                                            <li key={option}>
+                                            <li key={option.label}>
                                                 <a
                                                     onClick={(e) => {
                                                         e.preventDefault();
@@ -177,7 +183,7 @@ export default function ShopProducts() {
                                                             : ""
                                                     }
                                                 >
-                                                    {option}
+                                                    {option.label}
                                                 </a>
                                             </li>
                                         ))}
@@ -212,7 +218,10 @@ export default function ShopProducts() {
                             )}
 
                             <div className="h-36 flex items-center justify-center overflow-hidden">
-                                <Link href={`/products/${product._id}`} className="overflow-hidden">
+                                <Link
+                                    href={`/products/${product._id}`}
+                                    className="overflow-hidden"
+                                >
                                     <Image
                                         src={
                                             product.imageURLs?.[0]
@@ -254,20 +263,21 @@ export default function ShopProducts() {
                 </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2 my-10">
-                <div
-                    onClick={() => handlePrevious(currentPage)}
-                    className="flex items-center p-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer"
-                >
-                    <MdKeyboardDoubleArrowLeft />
-                    Previous
-                </div>
-                {Array.from({ length: totalPage }, (_, i) => i + 1).map(
-                    (page) => (
-                        <div
-                            key={page}
-                            onClick={() => setCurrentPage(page)}
-                            className={`
+            {totalPage > 0 && (
+                <div className="flex items-center justify-end gap-2 my-10">
+                    <div
+                        onClick={() => handlePrevious(currentPage)}
+                        className="flex items-center p-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer"
+                    >
+                        <MdKeyboardDoubleArrowLeft />
+                        Previous
+                    </div>
+                    {Array.from({ length: totalPage }, (_, i) => i + 1).map(
+                        (page) => (
+                            <div
+                                key={page}
+                                onClick={() => setCurrentPage(page)}
+                                className={`
                             px-3 py-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer
                             ${
                                 page === currentPage
@@ -275,18 +285,19 @@ export default function ShopProducts() {
                                     : "bg-white"
                             }
                         `}
-                        >
-                            {page}
-                        </div>
-                    )
-                )}
-                <div
-                    onClick={() => handleNext(currentPage)}
-                    className="flex items-center p-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer"
-                >
-                    <MdKeyboardDoubleArrowRight /> Next
+                            >
+                                {page}
+                            </div>
+                        )
+                    )}
+                    <div
+                        onClick={() => handleNext(currentPage)}
+                        className="flex items-center p-2 border border-gray-400 text-xs lg:text-base xl:text-xl font-semibold cursor-pointer"
+                    >
+                        <MdKeyboardDoubleArrowRight /> Next
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 }

@@ -15,15 +15,25 @@ import { FiUser } from "react-icons/fi";
 import { BiCategory } from "react-icons/bi";
 import { IoIosArrowDown } from "react-icons/io";
 import Link from "next/link";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store";
 import { RxCross2 } from "react-icons/rx";
+import { useRef } from "react";
+import { addToCart } from "@/store/slice/cartSlice";
+import { removeFromWishList } from "@/store/slice/wishlistSlice";
 
 export default function Header() {
+    const dispatch = useDispatch<AppDispatch>();
     const cart = useSelector((state: RootState) => state.cart.items);
     const wishlist = useSelector((state: RootState) => state.wishlist.items);
     const totalCart = cart.reduce((sum, item) => sum + item.count, 0);
     const totalWishlist = wishlist.reduce((sum, item) => sum + item.count, 0);
+
+    const wishlistRef = useRef<HTMLDialogElement | null>(null);
+
+    const handleWishlist = () => {
+        wishlistRef.current?.showModal();
+    };
 
     return (
         <div className="container mx-auto">
@@ -149,7 +159,10 @@ export default function Header() {
                 </div>
 
                 <div className="flex items-center gap-5 lg:gap-10 w-fit">
-                    <div className="flex items-center gap-2 w-fit cursor-pointer">
+                    <div
+                        onClick={handleWishlist}
+                        className="flex items-center gap-2 w-fit cursor-pointer"
+                    >
                         <div className="relative">
                             <FaRegHeart className="w-5 h-5 md:w-6 md:h-6" />
                             <span className="absolute -right-3 -top-3 bg-primary text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
@@ -242,6 +255,50 @@ export default function Header() {
             <div className="hidden lg:block">
                 <div className="divider"></div>
             </div>
+
+            <dialog ref={wishlistRef} id="wishlist" className="modal">
+                <div className="modal-box h-70 max-h-70 py-5 overflow-y-scroll">
+                    {wishlist.map((product, index) => (
+                        <div key={index} className="">
+                            <div className="flex items-center mb-3 gap-3 relative">
+                                <Image
+                                    src={product?.imageURLs?.[0]}
+                                    alt={product.name}
+                                    width={50}
+                                    height={50}
+                                />
+                                <div className="flex flex-col items-baseline gap-2">
+                                    <h2 className="font-semibold">
+                                        {product.name}
+                                    </h2>
+                                    <button
+                                        onClick={() =>
+                                            dispatch(addToCart(product))
+                                        }
+                                        className="hover:text-primary hover:underline cursor-pointer"
+                                    >
+                                        Add to Cart
+                                    </button>
+                                </div>
+                                <span
+                                    onClick={() =>
+                                        dispatch(
+                                            removeFromWishList(product._id)
+                                        )
+                                    }
+                                    className="w-8 h-8 hover:bg-gray-300 hover:text-red-500 rounded-full flex items-center justify-center cursor-pointer absolute right-2 top-1/3"
+                                >
+                                    <RxCross2 />
+                                </span>
+                            </div>
+                            <div className="divider"></div>
+                        </div>
+                    ))}
+                </div>
+                <form method="dialog" className="modal-backdrop">
+                    <button>close</button>
+                </form>
+            </dialog>
         </div>
     );
 }

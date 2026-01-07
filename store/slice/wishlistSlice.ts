@@ -29,8 +29,13 @@ const wishlist = createSlice({
                 });
             }
         },
+
+        removeFromWishList: (state, action: PayloadAction<string>) => {
+            const productId = action.payload;
+            state.items = state.items.filter((item) => item._id !== productId);
+        }
     },
 });
 
-export const { addToWishList } = wishlist.actions;
+export const { addToWishList, removeFromWishList } = wishlist.actions;
 export const wishlistReducer = wishlist.reducer;
