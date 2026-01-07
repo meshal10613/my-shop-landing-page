@@ -78,6 +78,17 @@ const cartSlice = createSlice({
             }
         },
 
+        removeItemFromCart: (state, action: PayloadAction<ProductsType>) => {
+            const product = action.payload;
+            const existingItem = state.items.find(
+                (item) => item._id === product._id
+            );
+            
+            if(!existingItem) return;
+
+            state.items = state.items.filter((item) => item._id !== product._id);
+        },
+
         clearCart: (state) => {
             state.items = [];
         },
@@ -92,6 +103,7 @@ export const {
     addToCart,
     addToCartWithCount,
     removeFromCart,
+    removeItemFromCart,
     clearCart,
     hydrateCart,
 } = cartSlice.actions;

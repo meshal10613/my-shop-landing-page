@@ -3,19 +3,23 @@
 import React, { useEffect, useState } from "react";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import Image from "next/image";
-import { FaRegHeart } from "react-icons/fa";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 import {
     MdKeyboardDoubleArrowLeft,
     MdKeyboardDoubleArrowRight,
 } from "react-icons/md";
 import Link from "next/link";
 import { ProductsType } from "./Home/Products";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store";
 import { addToCart } from "@/store/slice/cartSlice";
+import { addToWishList } from "@/store/slice/wishlistSlice";
+import { useRouter } from "next/navigation";
 
 export default function ShopProducts() {
     const dispatch = useDispatch<AppDispatch>();
+    const wishList = useSelector((state: RootState) => state.wishlist.items);
+    const router = useRouter();
 
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPage, setTotalPage] = useState(0);
@@ -66,6 +70,11 @@ export default function ShopProducts() {
         }
     };
 
+    const handleOrderNow = (product: ProductsType) => {
+        dispatch(addToCart(product));
+        router.push("/checkout");
+    };
+
     return (
         <div className="my-10 container mx-auto">
             <h2 className="text-xl lg:text-2xl font-semibold mb-10">
@@ -103,11 +112,14 @@ export default function ShopProducts() {
                                             <a
                                                 onClick={(e) => {
                                                     e.preventDefault();
-                                                    setSelectedSort(option.label);
+                                                    setSelectedSort(
+                                                        option.label
+                                                    );
                                                     setSortOpen(false);
                                                 }}
                                                 className={
-                                                    selectedSort === option.label
+                                                    selectedSort ===
+                                                    option.label
                                                         ? "active"
                                                         : ""
                                                 }
@@ -182,13 +194,25 @@ export default function ShopProducts() {
                             key={product._id}
                             className="bg-white shadow-xl p-3 max-w-60 mx-auto space-y-3 h-full flex flex-col relative"
                         >
-                            <FaRegHeart
-                                size={20}
-                                className="text-gray-400 absolute top-2 right-2 cursor-pointer hover:text-red-500"
-                            />
+                            {wishList.find(
+                                (item) => item._id === product._id
+                            ) ? (
+                                <FaHeart
+                                    size={20}
+                                    className="text-red-500 absolute top-2 right-2 cursor-not-allowed"
+                                />
+                            ) : (
+                                <FaRegHeart
+                                    onClick={() =>
+                                        dispatch(addToWishList(product))
+                                    }
+                                    size={20}
+                                    className="text-gray-400 absolute top-2 right-2 cursor-pointer"
+                                />
+                            )}
 
                             <div className="h-36 flex items-center justify-center overflow-hidden">
-                                <Link href={`/products/${product._id}`}>
+                                <Link href={`/products/${product._id}`} className="overflow-hidden">
                                     <Image
                                         src={
                                             product.imageURLs?.[0]
@@ -212,12 +236,18 @@ export default function ShopProducts() {
                                 {product.name}
                             </p>
                             <div className="flex items-center gap-3">
-                                <button onClick={() => dispatch(addToCart(product))} className="btn btn-sm border-2 border-primary text-primary transition-all hover:border-none hover:bg-primary hover:text-white hover:scale-110">
+                                <button
+                                    onClick={() => dispatch(addToCart(product))}
+                                    className="btn btn-sm border-2 border-primary text-primary transition-all hover:border-none hover:bg-primary hover:text-white hover:scale-110"
+                                >
                                     Add To Cart
                                 </button>
-                                <Link href={`/products/${product._id}`} className="btn btn-sm transition-all border-none bg-primary text-white hover:scale-110">
+                                <button
+                                    onClick={() => handleOrderNow(product)}
+                                    className="btn btn-sm transition-all border-none bg-primary text-white hover:scale-110"
+                                >
                                     Order Now
-                                </Link>
+                                </button>
                             </div>
                         </div>
                     ))}

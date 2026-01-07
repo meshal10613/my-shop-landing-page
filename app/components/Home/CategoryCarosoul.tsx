@@ -42,6 +42,7 @@ export default function CategoriesCarousel({ categories }: Props) {
             draggable={true}
             showDots={false}
             arrows={true}
+            removeArrowOnDeviceType={["sm", "md"]}
             partialVisible={false}
             centerMode={false}
             containerClass="pb-8"

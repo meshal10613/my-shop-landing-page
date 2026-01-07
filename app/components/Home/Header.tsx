@@ -17,11 +17,13 @@ import { IoIosArrowDown } from "react-icons/io";
 import Link from "next/link";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import { RxCross2 } from "react-icons/rx";
 
 export default function Header() {
     const cart = useSelector((state: RootState) => state.cart.items);
-    const totalCount = cart.reduce((sum, item) => sum + item.count, 0);
-
+    const wishlist = useSelector((state: RootState) => state.wishlist.items);
+    const totalCart = cart.reduce((sum, item) => sum + item.count, 0);
+    const totalWishlist = wishlist.reduce((sum, item) => sum + item.count, 0);
 
     return (
         <div className="container mx-auto">
@@ -79,12 +81,44 @@ export default function Header() {
                                 className="drawer-overlay"
                             ></label>
                             <ul className="menu bg-base-200 min-h-full w-100 p-4">
-                                {/* Sidebar content here */}
-                                <li>
-                                    <a>Sidebar Item 1</a>
+                                <label
+                                    htmlFor="my-drawer-1"
+                                    className="absolute right-4 top-4 btn btn-ghost w-10 h-10 rounded-full btn-sm"
+                                >
+                                    <RxCross2 className="w-5 h-5 rounded-full" />
+                                </label>
+                                <Link href={`/`} className="mb-5 w-fit">
+                                    <Image
+                                        src={logo}
+                                        alt="logo"
+                                        className="w-30 md:w-40 h-auto object-contain cursor-pointer"
+                                    />
+                                </Link>
+                                <li className="font-semibold text-primary hover:bg-primary hover:text-white rounded-lg">
+                                    <Link href={`/`} className="mx-auto">
+                                        Home
+                                    </Link>
                                 </li>
-                                <li>
-                                    <a>Sidebar Item 2</a>
+                                <li className="font-semibold text-primary hover:bg-primary hover:text-white rounded-lg">
+                                    <Link href={`/shop`} className="mx-auto">
+                                        Shop
+                                    </Link>
+                                </li>
+                                <li className="font-semibold text-primary hover:bg-primary hover:text-white rounded-lg">
+                                    <Link
+                                        href={`/about-us`}
+                                        className="mx-auto"
+                                    >
+                                        About Us
+                                    </Link>
+                                </li>
+                                <li className="font-semibold text-primary hover:bg-primary hover:text-white rounded-lg">
+                                    <Link
+                                        href={`/contact-us`}
+                                        className="mx-auto"
+                                    >
+                                        Contact Us
+                                    </Link>
                                 </li>
                             </ul>
                         </div>
@@ -119,18 +153,21 @@ export default function Header() {
                         <div className="relative">
                             <FaRegHeart className="w-5 h-5 md:w-6 md:h-6" />
                             <span className="absolute -right-3 -top-3 bg-primary text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                                0
+                                {totalWishlist}
                             </span>
                         </div>
                         <span className="text-xs hidden lg:block">
                             Wishlist
                         </span>
                     </div>
-                    <Link href={`/checkout`} className="flex items-center gap-2 cursor-pointer">
+                    <Link
+                        href={`/cart`}
+                        className="flex items-center gap-2 cursor-pointer"
+                    >
                         <div className="relative">
                             <BsCart3 className="w-5 h-5 md:w-6 md:h-6" />
                             <span className="absolute -right-3 -top-3 bg-primary text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                                {totalCount}
+                                {totalCart}
                             </span>
                         </div>
                         <span className="text-xs hidden lg:block">Cart</span>
@@ -161,19 +198,25 @@ export default function Header() {
                             </Link>
                         </li>
                         <li>
-                            <a href="/shop" className="hover:text-primary">
+                            <Link href="/shop" className="hover:text-primary">
                                 Shop
-                            </a>
+                            </Link>
                         </li>
                         <li>
-                            <a href="" className="hover:text-primary">
+                            <Link
+                                href="/about-us"
+                                className="hover:text-primary"
+                            >
                                 About Us
-                            </a>
+                            </Link>
                         </li>
                         <li>
-                            <a href="" className="hover:text-primary">
+                            <Link
+                                href="/contact-us"
+                                className="hover:text-primary"
+                            >
                                 Contact Us
-                            </a>
+                            </Link>
                         </li>
                     </ul>
                 </div>

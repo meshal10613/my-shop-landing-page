@@ -6,18 +6,21 @@ import { BsCart3 } from "react-icons/bs";
 import {
     FaFacebookSquare,
     FaGooglePlusG,
+    FaHeart,
     FaRegHeart,
     FaTwitter,
 } from "react-icons/fa";
 import { ProductsType } from "../components/Home/Products";
 import { BiChevronLeft, BiChevronRight } from "react-icons/bi";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store";
 import { addToCartWithCount } from "@/store/slice/cartSlice";
 import { useRouter } from "next/navigation";
+import { addToWishList } from "@/store/slice/wishlistSlice";
 
 export default function ProductDetails({ id }: { id: string }) {
     const dispatch = useDispatch<AppDispatch>();
+    const wishList = useSelector((state: RootState) => state.wishlist.items);
     const router = useRouter();
     const [count, setcount] = useState(0);
     const [product, setProduct] = useState<ProductsType | null>(null);
@@ -55,7 +58,7 @@ export default function ProductDetails({ id }: { id: string }) {
                 count,
             })
         );
-        router.push("/checkout");
+        router.push("/cart");
     };
 
     return (
@@ -194,10 +197,28 @@ export default function ProductDetails({ id }: { id: string }) {
                             </div>
                         </div>
                     </div>
-                    <div className="flex items-center gap-3 cursor-pointer">
-                        <FaRegHeart className="text-orange-500" /> Add to
-                        Wishlist
-                    </div>
+                    {wishList.find((item) => item._id === product?._id) ? (
+                        <div className="flex items-center gap-3 cursor-not-allowed">
+                            <FaHeart
+                                size={20}
+                                className="text-red-500"
+                            />
+                            <span>In Wishlist</span>
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-3 cursor-pointer">
+                            <FaRegHeart
+                                onClick={() =>
+                                    dispatch(
+                                        addToWishList(product as ProductsType)
+                                    )
+                                }
+                                size={20}
+                                className="text-gray-400"
+                            />
+                            <span>Add to Wishlist</span>
+                        </div>
+                    )}
                 </div>
                 <div className="flex items-center gap-5">
                     <h1>Share: </h1>
