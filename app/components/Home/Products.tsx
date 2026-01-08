@@ -4,38 +4,78 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import Link from "next/link";
-import { StaticImport } from "next/dist/shared/lib/get-img-props";
+import {
+    StaticImageData,
+    StaticImport,
+    StaticRequire,
+} from "next/dist/shared/lib/get-img-props";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { addToCart } from "@/store/slice/cartSlice";
 import { addToWishList } from "@/store/slice/wishlistSlice";
 import { useRouter } from "next/navigation";
 
+export type ImageSrc = string | StaticImport | StaticRequire | StaticImageData;
+
 export type ProductsType = {
     _id: string;
+    storeId?: string;
     name: string;
     sku: string;
     path: string;
     description: string;
-    category: string;
-    subCategory: string[];
-    productColor: string[];
-    saleCount: number;
+    category?: string[]; // now array, optional
+    subCategory?: string[]; // optional
+    childCategory?: string[]; // optional
+    categoryPath?: string[]; // optional
+    saleCount?: number;
     quantity: number;
-    buyingPrice: number;
+    buyingPrice?: number;
     productPrice: number;
     salePrice: number;
-    discount: number;
-    brand: string;
-    tags: string[];
-    imageURLs: (string | StaticImport)[];
+    discount?: number;
+    brand?: string;
+    type?: string;
+    tags?: string[];
+    imageURLs: [ImageSrc, ...ImageSrc[]]; // non-empty array
     youtube?: string;
-    size: string[];
-    ratingValue: number;
-    status: boolean;
+    size?: string[];
+    ratingValue?: number;
+    ingredient?: string;
+    how_to_use?: string;
+    offer_quantity?: number | null;
+    offer_discount?: number | null;
+    review?: string[];
+    attributes?: {
+        Color?: string[]; // optional array of color names
+        [key: string]: string[] | undefined; // allow other attributes dynamically
+    };
+    categoryPositions?: Record<string, string>;
+    variantType?: boolean;
+    stock?: boolean;
+    delivery?: boolean;
+    combo?: boolean;
+    variant?: {
+        _id: string;
+        attributes: Record<string, string>;
+        quantity?: number;
+        buyingPrice?: number;
+        productPrice?: number;
+        salePrice?: number;
+        offer_quantity?: number;
+        offer_discount?: number;
+        discount?: number;
+        image?: ImageSrc;
+        createdAt?: string;
+        updatedAt?: string;
+    }[];
+    wallet?: number;
+    status?: boolean;
+    productColor?: string[];
     createdAt: string;
     updatedAt: string;
     __v: number;
+    id?: string;
     wholesalePrice?: number;
     wholesaleStatus?: string;
     advance?: number;
