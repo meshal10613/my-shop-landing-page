@@ -14,12 +14,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { addToCart } from "@/store/slice/cartSlice";
 import { addToWishList } from "@/store/slice/wishlistSlice";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function ShopProducts() {
     const dispatch = useDispatch<AppDispatch>();
     const wishList = useSelector((state: RootState) => state.wishlist.items);
     const router = useRouter();
+
+    const searchParams = useSearchParams();
+    const category = searchParams.get("category");
 
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPage, setTotalPage] = useState(0);
@@ -48,7 +51,9 @@ export default function ShopProducts() {
         fetch(
             `https://ecommerce-saas-server-wine.vercel.app/api/v1/product/website?limit=10&page=${currentPage}&sortBy=salePrice&sortOrder=${
                 selectedSort === "Price Low To High" ? "asc" : "desc"
-            }&minPrice=${selectedFilter.min}&maxPrice=${selectedFilter.max}`,
+            }&minPrice=${selectedFilter.min}&maxPrice=${selectedFilter.max}${
+                typeof category === "string" ? `&category=${category}` : ""
+            }`,
             {
                 headers: {
                     "Content-Type": "application/json",
@@ -62,7 +67,7 @@ export default function ShopProducts() {
                 setTotalPage(data.data.meta.page);
             })
             .catch((err) => console.error("Failed to fetch categories:", err));
-    }, [currentPage, selectedSort, selectedFilter]);
+    }, [currentPage, selectedSort, selectedFilter, category]);
 
     const handlePrevious = (page: number) => {
         if (page > 1) {

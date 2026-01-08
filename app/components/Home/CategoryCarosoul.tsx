@@ -4,6 +4,7 @@ import React from "react";
 import Image from "next/image";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const responsive = {
     "2xl": { breakpoint: { max: 4000, min: 1536 }, items: 7 },
@@ -33,6 +34,15 @@ type Props = {
 };
 
 export default function CategoriesCarousel({ categories }: Props) {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+
+    const setCategory = (category: string) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set("category", category);
+        router.push(`/shop?${params.toString()}`);
+    };
+
     return (
         <Carousel
             responsive={responsive}
@@ -50,6 +60,7 @@ export default function CategoriesCarousel({ categories }: Props) {
         >
             {categories.map((category) => (
                 <div
+                    onClick={() => setCategory(category.parentCategory)}
                     key={category._id}
                     className="text-center group cursor-pointer bg-white shadow-xl py-5"
                 >

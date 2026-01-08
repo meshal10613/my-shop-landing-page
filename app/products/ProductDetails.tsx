@@ -22,6 +22,7 @@ export default function ProductDetails({ id }: { id: string }) {
     const dispatch = useDispatch<AppDispatch>();
     const wishList = useSelector((state: RootState) => state.wishlist.items);
     const router = useRouter();
+
     const [count, setcount] = useState(0);
     const [product, setProduct] = useState<ProductsType | null>(null);
 
@@ -145,7 +146,15 @@ export default function ProductDetails({ id }: { id: string }) {
                         You Save TK. {product?.discount}
                     </h6>
                 </div>
-                <p className="text-gray-400">{product?.description}</p>
+                {product?.description && (
+                    <div
+                        className="text-gray-400 py-1 prose max-w-none"
+                        dangerouslySetInnerHTML={{
+                            __html: product?.description,
+                        }}
+                    ></div>
+                )}
+                {/* <p className="text-gray-400">{product?.description}</p> */}
                 <div className="flex items-center gap-2">
                     <button
                         onClick={() => handleOrder(product as ProductsType)}
@@ -199,10 +208,7 @@ export default function ProductDetails({ id }: { id: string }) {
                     </div>
                     {wishList.find((item) => item._id === product?._id) ? (
                         <div className="flex items-center gap-3 cursor-not-allowed">
-                            <FaHeart
-                                size={20}
-                                className="text-red-500"
-                            />
+                            <FaHeart size={20} className="text-red-500" />
                             <span>In Wishlist</span>
                         </div>
                     ) : (
