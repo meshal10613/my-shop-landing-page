@@ -1,8 +1,8 @@
-import { ProductsType } from "@/app/components/Home/Products";
+import { ProductVarient } from "@/app/components/Home/Products";
 import { loadCartFromStorage } from "@/utils/cartStorage";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-export interface CartItem extends ProductsType {
+export interface CartItem extends ProductVarient {
     count: number;
 }
 
@@ -11,7 +11,7 @@ interface CartState {
 }
 
 type AddWithCountPayload = {
-    product: ProductsType;
+    product: ProductVarient;
     count: number;
 };
 
@@ -23,11 +23,13 @@ const cartSlice = createSlice({
     name: "cart",
     initialState,
     reducers: {
-        addToCart: (state, action: PayloadAction<ProductsType>) => {
+        addToCart: (state, action: PayloadAction<ProductVarient>) => {
             const product = action.payload;
 
             const existingItem = state.items.find(
-                (item) => item._id === product._id
+                (item) =>
+                    item._id === product._id &&
+                    item.attributes.Color === product.attributes.Color
             );
 
             if (existingItem) {
@@ -47,7 +49,9 @@ const cartSlice = createSlice({
             const { product, count } = action.payload;
 
             const existingItem = state.items.find(
-                (item) => item._id === product._id
+                (item) =>
+                    item._id === product._id &&
+                    item.attributes.Color === product.attributes.Color
             );
 
             if (existingItem) {
@@ -60,33 +64,32 @@ const cartSlice = createSlice({
             }
         },
 
-        removeFromCart: (state, action: PayloadAction<string>) => {
-            const productId = action.payload;
-
+        removeFromCart: (
+            state,
+            action: PayloadAction<{ _id: string; color: string }>
+        ) => {
+            const { _id, color } = action.payload;
             const existingItem = state.items.find(
-                (item) => item._id === productId
+                (item) => item._id === _id && item.attributes.Color === color
             );
-
             if (!existingItem) return;
-
             existingItem.count -= 1;
-
             if (existingItem.count <= 0) {
                 state.items = state.items.filter(
-                    (item) => item._id !== productId
+                    (item) =>
+                        !(item._id === _id && item.attributes.Color === color)
                 );
             }
         },
 
-        removeItemFromCart: (state, action: PayloadAction<ProductsType>) => {
-            const product = action.payload;
-            const existingItem = state.items.find(
-                (item) => item._id === product._id
+        removeItemFromCart: (
+            state,
+            action: PayloadAction<{ _id: string; color: string }>
+        ) => {
+            const { _id, color } = action.payload;
+            state.items = state.items.filter(
+                (item) => !(item._id === _id && item.attributes.Color === color)
             );
-            
-            if(!existingItem) return;
-
-            state.items = state.items.filter((item) => item._id !== product._id);
         },
 
         clearCart: (state) => {

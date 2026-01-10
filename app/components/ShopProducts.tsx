@@ -9,7 +9,7 @@ import {
     MdKeyboardDoubleArrowRight,
 } from "react-icons/md";
 import Link from "next/link";
-import { ProductsType } from "./Home/Products";
+import { ProductsType, ProductVarient } from "./Home/Products";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { addToCart } from "@/store/slice/cartSlice";
@@ -82,7 +82,12 @@ export default function ShopProducts() {
     };
 
     const handleOrderNow = (product: ProductsType) => {
-        dispatch(addToCart(product));
+        const p = {
+            ...(product?.variant?.[0] as ProductVarient),
+            name: product.name,
+            category: product.category,
+        };
+        dispatch(addToCart(p));
         router.push("/checkout");
     };
 
@@ -251,7 +256,15 @@ export default function ShopProducts() {
                             </p>
                             <div className="flex items-center gap-3">
                                 <button
-                                    onClick={() => dispatch(addToCart(product))}
+                                    onClick={() => {
+                                        const p = {
+                                            ...(product
+                                                ?.variant?.[0] as ProductVarient),
+                                            name: product.name,
+                                            category: product.category,
+                                        };
+                                        dispatch(addToCart(p));
+                                    }}
                                     className="btn btn-sm border-2 border-primary text-primary transition-all hover:border-none hover:bg-primary hover:text-white hover:scale-110"
                                 >
                                     Add To Cart

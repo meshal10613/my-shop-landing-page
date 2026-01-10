@@ -21,6 +21,7 @@ import { RxCross2 } from "react-icons/rx";
 import { useRef } from "react";
 import { addToCart } from "@/store/slice/cartSlice";
 import { removeFromWishList } from "@/store/slice/wishlistSlice";
+import { ProductsType, ProductVarient } from "./Products";
 
 export default function Header() {
     const dispatch = useDispatch<AppDispatch>();
@@ -258,7 +259,7 @@ export default function Header() {
 
             <dialog ref={wishlistRef} id="wishlist" className="modal">
                 <div className="modal-box h-70 max-h-70 py-5 overflow-y-scroll">
-                    {wishlist.map((product, index) => (
+                    {wishlist.map((product: ProductsType, index) => (
                         <div key={index} className="">
                             <div className="flex items-center mb-3 gap-3 relative">
                                 <Image
@@ -272,9 +273,15 @@ export default function Header() {
                                         {product.name}
                                     </h2>
                                     <button
-                                        onClick={() =>
-                                            dispatch(addToCart(product))
-                                        }
+                                        onClick={() => {
+                                            const p = {
+                                                ...(product
+                                                    ?.variant?.[0] as ProductVarient),
+                                                name: product.name,
+                                                category: product.category,
+                                            };
+                                            dispatch(addToCart(p));
+                                        }}
                                         className="hover:text-primary hover:underline cursor-pointer"
                                     >
                                         Add to Cart

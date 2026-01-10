@@ -17,6 +17,25 @@ import { useRouter } from "next/navigation";
 
 export type ImageSrc = string | StaticImport | StaticRequire | StaticImageData;
 
+export type ProductVarient = {
+    _id: string;
+    name?: string;
+    category?: string[];
+    attributes: {
+        Color: string;
+    };
+    quantity?: number;
+    buyingPrice: number;
+    productPrice: number;
+    salePrice: number;
+    offer_quantity?: number;
+    offer_discount?: number;
+    discount: number;
+    image: ImageSrc;
+    createdAt?: string;
+    updatedAt?: string;
+};
+
 export type ProductsType = {
     _id: string;
     storeId?: string;
@@ -24,7 +43,7 @@ export type ProductsType = {
     sku: string;
     path: string;
     description: string;
-    category?: string[]; // now array, optional
+    category: string[]; // now array, optional
     subCategory?: string[]; // optional
     childCategory?: string[]; // optional
     categoryPath?: string[]; // optional
@@ -55,20 +74,7 @@ export type ProductsType = {
     stock?: boolean;
     delivery?: boolean;
     combo?: boolean;
-    variant?: {
-        _id: string;
-        attributes: Record<string, string>;
-        quantity?: number;
-        buyingPrice?: number;
-        productPrice?: number;
-        salePrice?: number;
-        offer_quantity?: number;
-        offer_discount?: number;
-        discount?: number;
-        image?: ImageSrc;
-        createdAt?: string;
-        updatedAt?: string;
-    }[];
+    variant?: ProductVarient[];
     wallet?: number;
     status?: boolean;
     productColor?: string[];
@@ -105,7 +111,7 @@ export default function Products({ title }: { title: string }) {
     }, []);
 
     const handleOrderNow = (product: ProductsType) => {
-        dispatch(addToCart(product));
+        dispatch(addToCart(product?.variant?.[0] as ProductVarient));
         router.push("/checkout");
     };
 
@@ -139,7 +145,10 @@ export default function Products({ title }: { title: string }) {
                             )}
 
                             <div className="h-36 flex items-center justify-center overflow-hidden">
-                                <Link href={`/products/${product._id}`}>
+                                <Link
+                                    href={`/products/${product._id}`}
+                                    className="overflow-hidden"
+                                >
                                     <Image
                                         src={
                                             product.imageURLs?.[0]
@@ -164,7 +173,15 @@ export default function Products({ title }: { title: string }) {
                             </p>
                             <div className="flex items-center gap-3">
                                 <button
-                                    onClick={() => dispatch(addToCart(product))}
+                                    onClick={() => {
+                                        const p = {
+                                            ...(product
+                                                ?.variant?.[0] as ProductVarient),
+                                            name: product.name,
+                                            category: product.category,
+                                        };
+                                        dispatch(addToCart(p));
+                                    }}
                                     className="btn btn-sm border-2 border-primary text-primary transition-all hover:border-none hover:bg-primary hover:text-white hover:scale-110"
                                 >
                                     Add To Cart
