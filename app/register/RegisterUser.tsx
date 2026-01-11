@@ -1,7 +1,10 @@
 "use client";
 
+import { setToken, setUser } from "@/store/slice/userSlice";
 import Link from "next/link";
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import Swal from "sweetalert2";
 
 interface RegisterFormData {
     name: string;
@@ -11,6 +14,7 @@ interface RegisterFormData {
 }
 
 const RegisterUser = () => {
+    const dispatch = useDispatch();
     const [formData, setFormData] = useState<RegisterFormData>({
         name: "",
         email: "",
@@ -20,7 +24,6 @@ const RegisterUser = () => {
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<string | null>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -34,49 +37,55 @@ const RegisterUser = () => {
         e.preventDefault();
         setLoading(true);
         setError(null);
-        setSuccess(null);
 
-        // try {
-        //     const res = await fetch(
-        //         "https://ecommerce-saas-server-wine.vercel.app/api/v1/user",
-        //         {
-        //             method: "POST",
-        //             headers: {
-        //                 "Content-Type": "application/json",
-        //             },
-        //             body: JSON.stringify({
-        //                 name: formData.name,
-        //                 email: formData.email,
-        //                 phoneNumber: formData.phoneNumber,
-        //                 password: formData.password,
+        try {
+            const res = await fetch(
+                "https://ecommerce-saas-server-wine.vercel.app/api/v1/users/customer",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        name: formData.name,
+                        email: formData.email,
+                        phoneNumber: formData.phoneNumber,
+                        password: formData.password,
+                        userRole: "user",
+                        storeId: "0000121",
+                        status: "approved",
+                        isVerified: true,
+                    }),
+                }
+            );
 
-        //                 // fixed values from your API contract
-        //                 userRole: "user",
-        //                 storeId: "0000121",
-        //                 status: "approved",
-        //                 isVerified: true,
-        //             }),
-        //         }
-        //     );
+            const data = await res.json();
 
-        //     const data = await res.json();
-
-        //     if (!res.ok) {
-        //         throw new Error(data.message || "Registration failed");
-        //     }
-
-        //     setSuccess("Registration successful!");
-        //     setFormData({
-        //         name: "",
-        //         email: "",
-        //         phoneNumber: "",
-        //         password: "",
-        //     });
-        // } catch (err: any) {
-        //     setError(err.message);
-        // } finally {
-        //     setLoading(false);
-        // }
+            if (!res.ok) {
+                throw new Error(data.message || "Registration failed");
+            }
+            console.log(data);
+            const token = data.data.accessToken
+            localStorage.setItem("token", token);
+            dispatch(setToken(token));
+            dispatch(setUser(data.data.user))
+            setFormData({
+                name: "",
+                email: "",
+                phoneNumber: "",
+                password: "",
+            });
+            Swal.fire({
+                title: "Congratulations!",
+                text: "You've successfully signed up!",
+                icon: "success",
+                confirmButtonColor: "#3BB77E",
+            });
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -125,7 +134,15 @@ const RegisterUser = () => {
                     required
                     className="w-full border p-2 rounded"
                 />
-                <p>Already have an account? <Link href={`/login`} className="hover:link hover:link-primary">Login</Link></p>
+                <p>
+                    Already have an account?{" "}
+                    <Link
+                        href={`/login`}
+                        className="hover:link hover:link-primary"
+                    >
+                        Login
+                    </Link>
+                </p>
                 <button
                     type="submit"
                     disabled={loading}
@@ -135,7 +152,6 @@ const RegisterUser = () => {
                 </button>
             </form>
             {error && <p className="text-red-500 mt-3">{error}</p>}
-            {success && <p className="text-green-600 mt-3">{success}</p>}
         </div>
     );
 };

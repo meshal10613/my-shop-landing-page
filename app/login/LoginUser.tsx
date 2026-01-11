@@ -4,6 +4,7 @@ import { setToken } from "@/store/slice/userSlice";
 import Link from "next/link";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
+import Swal from "sweetalert2";
 
 interface LoginFormData {
     phoneNumber: string;
@@ -11,7 +12,7 @@ interface LoginFormData {
 }
 
 const LoginUser = () => {
-	const dispatch = useDispatch();
+    const dispatch = useDispatch();
     const [formData, setFormData] = useState<LoginFormData>({
         phoneNumber: "",
         password: "",
@@ -19,7 +20,6 @@ const LoginUser = () => {
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<string | null>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -33,9 +33,8 @@ const LoginUser = () => {
         e.preventDefault();
         setLoading(true);
         setError(null);
-        setSuccess(null);
 
-		try {
+        try {
             const res = await fetch(
                 "https://ecommerce-saas-server-wine.vercel.app/api/v1/auth/login",
                 {
@@ -54,14 +53,20 @@ const LoginUser = () => {
             if (!res.ok) {
                 throw new Error(data.message || "Registration failed");
             }
-			const token = data.data.accessToken;
-			localStorage.setItem("token", token);
-			dispatch(setToken(token));
+            const token = data.data.accessToken;
+            localStorage.setItem("token", token);
+            dispatch(setToken(token));
 
-            setSuccess(data.message);
             setFormData({
                 phoneNumber: "",
                 password: "",
+            });
+
+            Swal.fire({
+                title: "Congratulations!",
+                text: "You've successfully logged in!",
+                icon: "success",
+                confirmButtonColor: "#3BB77E",
             });
         } catch (err: any) {
             setError(err.message);
@@ -72,9 +77,7 @@ const LoginUser = () => {
 
     return (
         <div className="max-w-md mx-auto p-5">
-            <h2 className="text-2xl font-semibold mb-4 text-center">
-                Login
-            </h2>
+            <h2 className="text-2xl font-semibold mb-4 text-center">Login</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <input
                     type="tel"
@@ -109,11 +112,10 @@ const LoginUser = () => {
                     disabled={loading}
                     className="btn btn-block border-2 border-primary bg-primary text-white transition-all hover:bg-white hover:text-primary disabled:opacity-60"
                 >
-                    {loading ? "Registering..." : "Register"}
+                    {loading ? "Logging in..." : "Login"}
                 </button>
             </form>
             {error && <p className="text-red-500 mt-3">{error}</p>}
-            {success && <p className="text-green-600 mt-3">{success}</p>}
         </div>
     );
 };
