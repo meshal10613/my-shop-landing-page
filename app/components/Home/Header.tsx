@@ -27,7 +27,7 @@ export default function Header() {
     const dispatch = useDispatch<AppDispatch>();
     const cart = useSelector((state: RootState) => state.cart.items);
     const wishlist = useSelector((state: RootState) => state.wishlist.items);
-    const totalCart = cart.reduce((sum, item) => sum + item.count, 0);
+    const totalCart = cart.length;
     const totalWishlist = wishlist.reduce((sum, item) => sum + item.count, 0);
 
     const wishlistRef = useRef<HTMLDialogElement | null>(null);

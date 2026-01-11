@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import Link from "next/link";
@@ -11,9 +11,10 @@ import {
 } from "next/dist/shared/lib/get-img-props";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
-import { addToCart } from "@/store/slice/cartSlice";
+import { addToCartWithCount } from "@/store/slice/cartSlice";
 import { addToWishList } from "@/store/slice/wishlistSlice";
 import { useRouter } from "next/navigation";
+import { addToCheckoutWithCount } from "@/store/slice/checkoutSlice";
 
 export type ImageSrc = string | StaticImport | StaticRequire | StaticImageData;
 
@@ -94,6 +95,12 @@ export default function Products({ title }: { title: string }) {
     const wishList = useSelector((state: RootState) => state.wishlist.items);
     const router = useRouter();
 
+    const addToCartRef = useRef<HTMLDialogElement | null>(null);
+    const [cart, setCart] = useState<ProductsType>({} as ProductsType);
+    const [count, setCount] = useState(1);
+    const [active, setActive] = useState(cart?.attributes?.Color?.[0] ?? "");
+    const [t, setT] = useState("");
+
     const [products, setProducts] = useState<ProductsType[]>([]);
     useEffect(() => {
         fetch(
@@ -110,9 +117,62 @@ export default function Products({ title }: { title: string }) {
             .catch((err) => console.error("Failed to fetch categories:", err));
     }, []);
 
-    const handleOrderNow = (product: ProductsType) => {
-        dispatch(addToCart(product?.variant?.[0] as ProductVarient));
-        router.push("/checkout");
+    // const handleOrderNow = (product: ProductsType) => {
+    //     dispatch(addToCart(product?.variant?.[0] as ProductVarient));
+    //     router.push("/checkout");
+    // };
+
+    const handleMinus = (c: number) => {
+        if (c === 1) return;
+        setCount(c - 1);
+    };
+
+    const handlePlus = (c: number) => {
+        setCount(c + 1);
+    };
+
+    const handleColor = (color: ProductVarient) => {
+        if (active) return setActive("");
+
+        setActive(color.attributes.Color);
+    };
+
+    const handleAddToCartModal = (product: ProductsType) => {
+        setT("Add To Cart");
+        setCart(product);
+        addToCartRef.current?.showModal();
+    };
+
+    const checkoutModal = (product: ProductsType) => {
+        setT("Checkout");
+        setCart(product);
+        addToCartRef.current?.showModal();
+    };
+
+    const handleAddToCart = () => {
+        if (!active) return;
+
+        if (t === "Add To Cart") {
+            const p = cart?.variant?.find((p) => p.attributes.Color === active);
+            if (!p) return;
+            p.name = cart.name;
+            p.category = cart.category;
+            dispatch(
+                addToCartWithCount({
+                    count,
+                    product: p,
+                })
+            );
+            addToCartRef.current?.close();
+            setCount(1);
+        } else if (t === "Checkout") {
+            const p = cart?.variant?.find((p) => p.attributes.Color === active);
+            if (!p) return;
+            p.name = cart.name;
+            p.category = cart.category;
+            dispatch(addToCheckoutWithCount({ count, product: p }));
+            router.push("/checkout");
+        } else return;
     };
 
     return (
@@ -173,21 +233,15 @@ export default function Products({ title }: { title: string }) {
                             </p>
                             <div className="flex items-center gap-3">
                                 <button
-                                    onClick={() => {
-                                        const p = {
-                                            ...(product
-                                                ?.variant?.[0] as ProductVarient),
-                                            name: product.name,
-                                            category: product.category,
-                                        };
-                                        dispatch(addToCart(p));
-                                    }}
-                                    className="btn btn-sm border-2 border-primary text-primary transition-all hover:border-none hover:bg-primary hover:text-white hover:scale-110"
+                                    onClick={() =>
+                                        handleAddToCartModal(product)
+                                    }
+                                    className="btn btn-sm border-2 border-primary text-primary transition-all hover:bg-primary hover:text-white hover:scale-110"
                                 >
                                     Add To Cart
                                 </button>
                                 <button
-                                    onClick={() => handleOrderNow(product)}
+                                    onClick={() => checkoutModal(product)}
                                     className="btn btn-sm transition-all border-none bg-primary text-white hover:scale-110"
                                 >
                                     Order Now
@@ -197,6 +251,74 @@ export default function Products({ title }: { title: string }) {
                     ))}
                 </div>
             </div>
+
+            {/* Add to cart modal */}
+            <dialog ref={addToCartRef} id="wishlist" className="modal">
+                <div className="modal-box h-70 max-h-70 py-5 space-y-5">
+                    <h2 className="text-xl font-semibold">{t}</h2>
+                    <div className="flex items-center gap-5">
+                        <p>Quantity:</p>
+                        <div className="border border-gray-300 rounded-md p-4 flex items-center gap-5">
+                            <h2
+                                onClick={() => handleMinus(count)}
+                                className="w-7 h-7 rounded-full bg-[#DFDFDF] text-white flex items-center justify-center text-xl cursor-pointer"
+                            >
+                                -
+                            </h2>
+                            <h2>{count}</h2>
+                            <h2
+                                onClick={() => handlePlus(count)}
+                                className="w-7 h-7 rounded-full text-white bg-orange-400 flex items-center justify-center text-xl cursor-pointer"
+                            >
+                                +
+                            </h2>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-5">
+                        <p>Color:</p>
+                        <div>
+                            {cart?.attributes?.Color &&
+                                cart.attributes.Color.length > 0 && (
+                                    <div className="flex items-center gap-3">
+                                        {cart?.variant?.map((color) => (
+                                            <div
+                                                onClick={() =>
+                                                    handleColor(color)
+                                                }
+                                                key={color._id}
+                                                className={`flex items-center gap-2 border-2 border-gray-300 p-2 rounded-md cursor-pointer ${
+                                                    active ===
+                                                    color.attributes.Color
+                                                        ? "border-primary"
+                                                        : ""
+                                                }`}
+                                            >
+                                                <Image
+                                                    src={color?.image}
+                                                    alt={color.attributes.Color}
+                                                    width={20}
+                                                    height={20}
+                                                />
+                                                <span>
+                                                    {color.attributes.Color}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => handleAddToCart()}
+                        className="btn btn-sm border-2 border-primary text-primary transition-all hover:bg-primary hover:text-white hover:scale-110"
+                    >
+                        {t === "Add To Cart" ? "Add To Cart" : "Checkout"}
+                    </button>
+                </div>
+                <form method="dialog" className="modal-backdrop" onClick={() => setCount(1)}>
+                    <button>close</button>
+                </form>
+            </dialog>
         </div>
     );
 }

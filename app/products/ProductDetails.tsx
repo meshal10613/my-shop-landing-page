@@ -13,7 +13,7 @@ import {
 // import { BiChevronLeft, BiChevronRight } from "react-icons/bi";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
-import { addToCart, addToCartWithCount } from "@/store/slice/cartSlice";
+import { addToCart } from "@/store/slice/cartSlice";
 import { useRouter } from "next/navigation";
 import { addToWishList } from "@/store/slice/wishlistSlice";
 import {
@@ -23,13 +23,14 @@ import {
 } from "../components/Home/Products";
 
 import placeholder from "@/app/assets/category1.png";
+import { addToCheckoutWithCount } from "@/store/slice/checkoutSlice";
 
 export default function ProductDetails({ id }: { id: string }) {
     const dispatch = useDispatch<AppDispatch>();
     const wishList = useSelector((state: RootState) => state.wishlist.items);
     const router = useRouter();
 
-    const [count, setCount] = useState(0);
+    const [count, setCount] = useState(1);
     const [product, setProduct] = useState<ProductsType | null>(null);
     const [active, setActive] = useState(product?.attributes?.Color?.[0] ?? "");
     const [currentImage, setCurrentImage] = useState<ImageSrc>(placeholder);
@@ -53,7 +54,7 @@ export default function ProductDetails({ id }: { id: string }) {
     }, [id]);
 
     const handleMinus = (c: number) => {
-        if (c === 0) return;
+        if (c === 1) return;
         setCount(c - 1);
     };
 
@@ -71,7 +72,7 @@ export default function ProductDetails({ id }: { id: string }) {
                 p.name = product.name;
                 p.category = product.category;
                 dispatch(
-                    addToCartWithCount({
+                    addToCheckoutWithCount({
                         count,
                         product: p,
                     })
@@ -85,7 +86,7 @@ export default function ProductDetails({ id }: { id: string }) {
             data.name = product.name;
             data.category = product.category;
             dispatch(
-                addToCartWithCount({
+                addToCheckoutWithCount({
                     count,
                     product: data,
                 })

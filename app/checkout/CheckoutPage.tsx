@@ -19,13 +19,12 @@ import { MdDone } from "react-icons/md";
 
 const CheckoutPage = () => {
     const dispatch = useDispatch<AppDispatch>();
-    const cart = useSelector((state: RootState) => state.cart.items);
-    const totalCount = cart.reduce((sum, item) => sum + item.count, 0);
-    const subTotal = cart.reduce(
+    const checkout = useSelector((state: RootState) => state.checkout.items);
+    const subTotal = checkout.reduce(
         (sum, item) => sum + item.productPrice * item.count,
         0
     );
-    const grandTotal = cart.reduce(
+    const grandTotal = checkout.reduce(
         (sum, item) => sum + item.salePrice * item.count,
         0
     );
@@ -127,10 +126,10 @@ const CheckoutPage = () => {
             </div>
             <div className="col-span-1 mx-5">
                 <h2 className="text-xl lg:text-2xl font-semibold">
-                    Order Items ({totalCount})
+                    Order Items ({checkout.length})
                 </h2>
                 <div className="divider"></div>
-                {cart.map((item, index) => (
+                {checkout.map((item, index) => (
                     <div
                         key={index}
                         className="border border-gray-300 p-2 rounded-md mb-5 flex items-center gap-3 relative"
