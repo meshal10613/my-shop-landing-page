@@ -315,7 +315,11 @@ export default function Products({ title }: { title: string }) {
                         {t === "Add To Cart" ? "Add To Cart" : "Checkout"}
                     </button>
                 </div>
-                <form method="dialog" className="modal-backdrop" onClick={() => setCount(1)}>
+                <form
+                    method="dialog"
+                    className="modal-backdrop"
+                    onClick={() => setCount(1)}
+                >
                     <button>close</button>
                 </form>
             </dialog>

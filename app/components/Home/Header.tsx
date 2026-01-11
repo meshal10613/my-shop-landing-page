@@ -22,11 +22,15 @@ import { useRef } from "react";
 import { addToCart } from "@/store/slice/cartSlice";
 import { removeFromWishList } from "@/store/slice/wishlistSlice";
 import { ProductsType, ProductVarient } from "./Products";
+import { logout } from "@/store/slice/userSlice";
+import Swal from "sweetalert2";
 
 export default function Header() {
     const dispatch = useDispatch<AppDispatch>();
     const cart = useSelector((state: RootState) => state.cart.items);
     const wishlist = useSelector((state: RootState) => state.wishlist.items);
+    const user = useSelector((state: RootState) => state.user.user);
+    console.log(user);
     const totalCart = cart.length;
     const totalWishlist = wishlist.reduce((sum, item) => sum + item.count, 0);
 
@@ -34,6 +38,30 @@ export default function Header() {
 
     const handleWishlist = () => {
         wishlistRef.current?.showModal();
+    };
+
+    const handleLogout = () => {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3BB77E",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, Logout!",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                dispatch(logout());
+                localStorage.removeItem("token");
+                Swal.fire({
+                    title: "Logged out!",
+                    text: "You have been logged out.",
+                    icon: "success",
+                    confirmButtonColor: "#3BB77E",
+                    confirmButtonText: "Done!",
+                });
+            }
+        });
     };
 
     return (
@@ -186,12 +214,47 @@ export default function Header() {
                         </div>
                         <span className="text-xs hidden lg:block">Cart</span>
                     </Link>
-                    <div className="flex items-center gap-2 cursor-pointer">
+                    {user ? (
                         <div>
-                            <FiUser className="w-5 h-5 md:w-6 md:h-6" />
+                            <div className="dropdown dropdown-end">
+                                <div tabIndex={0} role="button">
+                                    <Image
+                                        src={user.profileImgURL}
+                                        alt={user.name}
+                                        width={30}
+                                        height={30}
+                                        className="rounded-full cursor-pointer"
+                                    />
+                                </div>
+                                <ul
+                                    tabIndex={-1}
+                                    className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+                                >
+                                    <li className="transition-all duration-300 hover:bg-primary hover:text-white">
+                                        <a>{user.name}</a>
+                                    </li>
+                                    <li
+                                        onClick={handleLogout}
+                                        className="transition-all duration-300 hover:bg-primary hover:text-white"
+                                    >
+                                        <a>Logout</a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
-                        <span className="text-xs hidden lg:block">Account</span>
-                    </div>
+                    ) : (
+                        <Link
+                            href={`/register`}
+                            className="flex items-center gap-2 cursor-pointer"
+                        >
+                            <div>
+                                <FiUser className="w-5 h-5 md:w-6 md:h-6" />
+                            </div>
+                            <span className="text-xs hidden lg:block">
+                                Account
+                            </span>
+                        </Link>
+                    )}
                 </div>
             </div>
             <div className="hidden lg:block">

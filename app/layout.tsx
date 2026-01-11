@@ -4,6 +4,8 @@ import "./globals.css";
 import Header from "./components/Home/Header";
 import Footer from "./components/Home/Footer";
 import ReduxProviderWrapper from "./components/ReduxProviderWrapper";
+import AuthLoader from "./components/AuthLoader";
+import RestoreAuth from "./components/RestoreAuth";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -31,6 +33,8 @@ export default function RootLayout({
                 className={`${geistSans.variable} ${geistMono.variable} antialiased max-w-324 mx-auto`}
             >
                 <ReduxProviderWrapper>
+                    <RestoreAuth/>
+                    <AuthLoader/>
                     <Header />
                     {children}
                     <Footer />
