@@ -2,6 +2,7 @@
 
 import { setToken, setUser } from "@/store/slice/userSlice";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import Swal from "sweetalert2";
@@ -14,6 +15,7 @@ interface RegisterFormData {
 }
 
 const RegisterUser = () => {
+    const router = useRouter();
     const dispatch = useDispatch();
     const [formData, setFormData] = useState<RegisterFormData>({
         name: "",
@@ -37,6 +39,12 @@ const RegisterUser = () => {
         e.preventDefault();
         setLoading(true);
         setError(null);
+
+        if (!/^\d{11}$/.test(formData.phoneNumber)) {
+            setError("Phone number must be exactly 11 digits");
+            setLoading(false);
+            return;
+        }
 
         try {
             const res = await fetch(
@@ -64,11 +72,10 @@ const RegisterUser = () => {
             if (!res.ok) {
                 throw new Error(data.message || "Registration failed");
             }
-            console.log(data);
-            const token = data.data.accessToken
+            const token = data.data.accessToken;
             localStorage.setItem("token", token);
             dispatch(setToken(token));
-            dispatch(setUser(data.data.user))
+            dispatch(setUser(data.data.user));
             setFormData({
                 name: "",
                 email: "",
@@ -81,6 +88,7 @@ const RegisterUser = () => {
                 icon: "success",
                 confirmButtonColor: "#3BB77E",
             });
+            router.push("/");
         } catch (err: any) {
             setError(err.message);
         } finally {

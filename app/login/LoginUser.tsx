@@ -2,6 +2,7 @@
 
 import { setToken } from "@/store/slice/userSlice";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import Swal from "sweetalert2";
@@ -12,6 +13,7 @@ interface LoginFormData {
 }
 
 const LoginUser = () => {
+    const router = useRouter();
     const dispatch = useDispatch();
     const [formData, setFormData] = useState<LoginFormData>({
         phoneNumber: "",
@@ -33,6 +35,12 @@ const LoginUser = () => {
         e.preventDefault();
         setLoading(true);
         setError(null);
+
+        if (!/^\d{11}$/.test(formData.phoneNumber)) {
+            setError("Phone number must be exactly 11 digits");
+            setLoading(false);
+            return;
+        }
 
         try {
             const res = await fetch(
@@ -68,6 +76,7 @@ const LoginUser = () => {
                 icon: "success",
                 confirmButtonColor: "#3BB77E",
             });
+            router.push("/");
         } catch (err: any) {
             setError(err.message);
         } finally {

@@ -25,11 +25,10 @@ const cartSlice = createSlice({
     reducers: {
         addToCart: (state, action: PayloadAction<ProductVarient>) => {
             const product = action.payload;
-
             const existingItem = state.items.find(
                 (item) =>
                     item._id === product._id &&
-                    item.attributes.Color === product.attributes.Color
+                    item.attributes?.Color === product.attributes?.Color
             );
 
             if (existingItem) {
@@ -51,8 +50,9 @@ const cartSlice = createSlice({
             const existingItem = state.items.find(
                 (item) =>
                     item._id === product._id &&
-                    item.attributes.Color === product.attributes.Color
+                    item.attributes?.Color === product.attributes?.Color
             );
+            console.log(state.items)
 
             if (existingItem) {
                 existingItem.count += count;

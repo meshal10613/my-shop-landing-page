@@ -8,14 +8,10 @@ import nogod from "@/app/assets/nogod.png";
 import { FaArrowLeftLong, FaCircleCheck } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
-import {
-    addToCart,
-    removeFromCart,
-    removeItemFromCart,
-} from "@/store/slice/cartSlice";
 import { RxCross2 } from "react-icons/rx";
 import Link from "next/link";
 import { MdDone } from "react-icons/md";
+import { addToCheckout, removeFromChekout, removeItemFromCheckout } from "@/store/slice/checkoutSlice";
 
 const CheckoutPage = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -156,7 +152,7 @@ const CheckoutPage = () => {
                                 <span
                                     onClick={() =>
                                         dispatch(
-                                            removeFromCart({
+                                            removeFromChekout({
                                                 _id: item._id,
                                                 color: item.attributes.Color,
                                             })
@@ -168,7 +164,9 @@ const CheckoutPage = () => {
                                 </span>
                                 <span>{item.count}</span>
                                 <span
-                                    onClick={() => dispatch(addToCart(item))}
+                                    onClick={() =>
+                                        dispatch(addToCheckout(item))
+                                    }
                                     className="p-1 w-5 h-5 flex items-center justify-center cursor-pointer bg-gray-300"
                                 >
                                     +
@@ -183,7 +181,7 @@ const CheckoutPage = () => {
                             <span
                                 onClick={() =>
                                     dispatch(
-                                        removeItemFromCart({
+                                        removeItemFromCheckout({
                                             _id: item._id,
                                             color: item.attributes.Color,
                                         })

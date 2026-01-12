@@ -104,6 +104,7 @@ export default function ShopProducts() {
     };
 
     const handleAddToCartModal = (product: ProductsType) => {
+        setT("Add To Cart");
         setCart(product);
         addToCartRef.current?.showModal();
     };

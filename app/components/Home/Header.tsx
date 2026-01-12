@@ -30,7 +30,6 @@ export default function Header() {
     const cart = useSelector((state: RootState) => state.cart.items);
     const wishlist = useSelector((state: RootState) => state.wishlist.items);
     const user = useSelector((state: RootState) => state.user.user);
-    console.log(user);
     const totalCart = cart.length;
     const totalWishlist = wishlist.reduce((sum, item) => sum + item.count, 0);
 
@@ -219,7 +218,7 @@ export default function Header() {
                             <div className="dropdown dropdown-end">
                                 <div tabIndex={0} role="button">
                                     <Image
-                                        src={user.profileImgURL}
+                                        src={user.profileImgURL ?? "https://img.daisyui.com/images/profile/demo/yellingcat@192.webp"}
                                         alt={user.name}
                                         width={30}
                                         height={30}
@@ -244,7 +243,7 @@ export default function Header() {
                         </div>
                     ) : (
                         <Link
-                            href={`/register`}
+                            href={`/login`}
                             className="flex items-center gap-2 cursor-pointer"
                         >
                             <div>

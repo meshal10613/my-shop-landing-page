@@ -2,13 +2,15 @@
 
 import { AppDispatch, RootState } from "@/store";
 import { addToCart, removeFromCart } from "@/store/slice/cartSlice";
+import { addToCheckoutWithCount } from "@/store/slice/checkoutSlice";
 import Image from "next/image";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { FaMinus, FaPlus } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 
 const Cart = () => {
+    const router = useRouter();
     const dispatch = useDispatch<AppDispatch>();
     const cart = useSelector((state: RootState) => state.cart.items);
     const totalCount = cart.reduce((sum, item) => sum + item.count, 0);
@@ -20,6 +22,16 @@ const Cart = () => {
         (sum, item) => sum + item.salePrice * item.count,
         0
     );
+
+    const handleAddToCheckout = () => {
+        cart.map((item) =>
+            dispatch(
+                addToCheckoutWithCount({ count: item.count, product: item })
+            )
+        );
+        router.push("/checkout");
+    };
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 mx-3">
             <div className="col-span-1 lg:col-span-2">
@@ -204,12 +216,12 @@ const Cart = () => {
                     <p className="text-xl font-semibold">Grand Total</p>
                     <p className="text-xl font-semibold">৳ {grandTotal}</p>
                 </div>
-                <Link
-                    href={`/checkout`}
+                <button
+                    onClick={handleAddToCheckout}
                     className="btn btn-block btn-primary text-white"
                 >
                     Checkout
-                </Link>
+                </button>
             </div>
         </div>
     );
