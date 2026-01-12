@@ -4,31 +4,38 @@ import { RootState } from "@/store";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getMyProfile } from "../utils/getMyProfile";
-import { setUser } from "@/store/slice/userSlice";
+import { setUser, startLoading, stopLoading } from "@/store/slice/userSlice";
 
 const useLoadUser = () => {
     const dispatch = useDispatch();
-    const token = useSelector((state: RootState) => state.user.token);
     const user = useSelector((state: RootState) => state.user.user);
 
     useEffect(() => {
-        if (!token) {
+        const token = localStorage.getItem("token");
+        if (token === null) {
+            dispatch(stopLoading());
             return;
         }
 
-        if (user) return;
+        if (user) {
+            dispatch(stopLoading());
+            return;
+        }
 
         const fetchUser = async () => {
+            dispatch(startLoading());
+
             try {
                 const data = await getMyProfile(token);
                 dispatch(setUser(data.data));
             } catch (error) {
                 console.error("Profile fetch failed", error);
+                dispatch(stopLoading());
             }
         };
 
         fetchUser();
-    }, [token, dispatch, user]);
+    }, [dispatch, user]);
 };
 
 export default useLoadUser;

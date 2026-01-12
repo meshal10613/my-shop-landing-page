@@ -4,6 +4,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface ChekoutItem extends ProductVarient {
     count: number;
+    productId: string;
 }
 
 interface ChekoutState {
@@ -13,6 +14,7 @@ interface ChekoutState {
 type AddWithCountPayload = {
     product: ProductVarient;
     count: number;
+    productId: string;
 };
 
 const initialState: ChekoutState = {
@@ -23,7 +25,7 @@ const checkoutSlice = createSlice({
     name: "checkout",
     initialState,
     reducers: {
-        addToCheckout: (state, action: PayloadAction<ProductVarient>) => {
+        addToCheckout: (state, action: PayloadAction<ChekoutItem>) => {
             const product = action.payload;
             const existingItem = state.items.find(
                 (item) =>
@@ -45,7 +47,7 @@ const checkoutSlice = createSlice({
             state,
             action: PayloadAction<AddWithCountPayload>
         ) => {
-            const { product, count } = action.payload;
+            const { product, count, productId } = action.payload;
 
             const existingItem = state.items.find(
                 (item) =>
@@ -59,6 +61,7 @@ const checkoutSlice = createSlice({
                 state.items.push({
                     ...product,
                     count,
+                    productId
                 });
             }
         },

@@ -75,6 +75,7 @@ export default function ProductDetails({ id }: { id: string }) {
                     addToCheckoutWithCount({
                         count,
                         product: p,
+                        productId: product._id,
                     })
                 );
             }
@@ -89,6 +90,7 @@ export default function ProductDetails({ id }: { id: string }) {
                 addToCheckoutWithCount({
                     count,
                     product: data,
+                    productId: product._id,
                 })
             );
             return router.push("/checkout");
@@ -97,21 +99,28 @@ export default function ProductDetails({ id }: { id: string }) {
     };
 
     const handleAddToCart = (product: ProductsType) => {
-        if(active){
+        if (active) {
             const p = product?.variant?.find(
                 (p) => p.attributes.Color === active
             );
             if (p) {
-                p.name = product.name;
-                p.category = product.category;
-                dispatch(addToCart(p));
+                const data = {
+                    ...p,
+                    name: product.name,
+                    category: product.category,
+                    productId: product._id,
+                    count: 1,
+                };
+                dispatch(addToCart(data));
             }
-            return
+            return;
         }
         const p = {
             ...(product?.variant?.[0] as ProductVarient),
             name: product?.name,
             category: product?.category,
+            count: 1,
+            productId: product?._id,
         };
         dispatch(addToCart(p));
     };

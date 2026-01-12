@@ -341,6 +341,8 @@ export default function Header() {
                                                     ?.variant?.[0] as ProductVarient),
                                                 name: product.name,
                                                 category: product.category,
+                                                productId: product._id,
+                                                count: 1
                                             };
                                             dispatch(addToCart(p));
                                         }}

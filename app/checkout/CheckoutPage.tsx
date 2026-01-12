@@ -11,11 +11,22 @@ import { AppDispatch, RootState } from "@/store";
 import { RxCross2 } from "react-icons/rx";
 import Link from "next/link";
 import { MdDone } from "react-icons/md";
-import { addToCheckout, removeFromChekout, removeItemFromCheckout } from "@/store/slice/checkoutSlice";
+import {
+    addToCheckout,
+    removeFromChekout,
+    removeItemFromCheckout,
+} from "@/store/slice/checkoutSlice";
+
+interface CheckoutFormData {
+    fullName: string;
+    phoneNumber: string;
+    address: string;
+}
 
 const CheckoutPage = () => {
     const dispatch = useDispatch<AppDispatch>();
     const checkout = useSelector((state: RootState) => state.checkout.items);
+    const user = useSelector((state: RootState) => state.user.user);
     const subTotal = checkout.reduce(
         (sum, item) => sum + item.productPrice * item.count,
         0
@@ -24,8 +35,96 @@ const CheckoutPage = () => {
         (sum, item) => sum + item.salePrice * item.count,
         0
     );
-
     const [payment, setPayment] = useState("cod");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [formData, setFormData] = useState<CheckoutFormData>({
+        fullName: "",
+        phoneNumber: "",
+        address: "",
+    });
+
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    ) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleConfirmOrder = async () => {
+        if (formData.fullName.length < 1)
+            return setError("Please enter your name");
+        if (formData.phoneNumber.length < 1)
+            return setError("Please enter your phone number");
+        if (!/^\d{11}$/.test(formData.phoneNumber))
+            return setError("Your phone number must be 11 digits");
+        if (formData.address.length < 1)
+            return setError("Please enter your address");
+        if (payment.length < 1)
+            return setError("Please select a payment method");
+        if (
+            formData.fullName.length > 0 &&
+            formData.phoneNumber.length > 0 &&
+            formData.address.length > 0 &&
+            payment.length > 0
+        ) {
+            setLoading(true);
+            const orderItem = checkout.map((item) => ({
+                product: item.productId,
+                name: item.name,
+                price: item.salePrice,
+                quantity: item.count,
+                originalProductPrice: item.buyingPrice,
+                imageURL: item.image,
+                variant: item._id,
+                category: item.category?.[0] ?? null,
+            }));
+            const paymentData = {
+                orderItem: orderItem,
+                user: user?._id,
+                shippingPrice: "0",
+                mobileNumber: formData.phoneNumber,
+                fullName: formData.fullName,
+                totalAmount: `${subTotal}`,
+                afterDiscountPrice: `${grandTotal}`,
+                originalProductPrice: `${subTotal}`,
+                couponDiscount: `${subTotal - grandTotal}`,
+                orderType: "website",
+                shippingAddress: {
+                    address: formData.address,
+                    email: user?.email,
+                    firstName: formData.fullName,
+                    phone: formData.phoneNumber,
+                    note: "",
+                },
+            };
+            console.log(paymentData)
+            // try {
+            //     const response = await fetch(
+            //         `https://ecommerce-saas-server-wine.vercel.app/api/v1/order`,
+            //         {
+            //             method: "POST",
+            //             headers: {
+            //                 "Content-Type": "application/json",
+            //                 "store-id": `0000121`,
+            //             },
+            //             body: JSON.stringify(paymentData),
+            //         }
+            //     );
+
+            //     const data = await response.json();
+            //     console.log(data)
+            // } catch (error: any) {
+            //     setError(error.message);
+            // } finally {
+            //     setLoading(false);
+            // }
+        }
+    };
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
             <div className="col-span-1 lg:col-span-2 mx-5">
@@ -36,24 +135,30 @@ const CheckoutPage = () => {
                 <div className="flex flex-col lg:flex-row gap-5 items-center w-full justify-between mb-5">
                     <input
                         type="text"
-                        name="name"
+                        name="fullName"
                         placeholder="Full Name *"
                         className="input border-2 border-gray-200 focus:outline-none w-full"
                         required
+                        value={formData.fullName}
+                        onChange={handleChange}
                     />
                     <input
                         type="text"
-                        name="number"
+                        name="phoneNumber"
                         placeholder="Phone Number *"
                         className="input border-2 border-gray-200 focus:outline-none w-full"
                         required
+                        value={formData.phoneNumber}
+                        onChange={handleChange}
                     />
                 </div>
                 <textarea
-                    name="review"
+                    name="address"
                     placeholder="Full Address *"
                     className="textarea border-2 border-gray-200 focus:outline-none w-full mb-5"
                     required
+                    value={formData.address}
+                    onChange={handleChange}
                 ></textarea>
 
                 <h2 className="text-xl lg:text-2xl font-semibold">
@@ -217,10 +322,22 @@ const CheckoutPage = () => {
                     <Link href="/cart" className="flex items-center gap-2">
                         <FaArrowLeftLong /> Back to Cart
                     </Link>
-                    <button className="btn btn-primary text-white flex items-center justify-center">
-                        <MdDone /> Confirm Order
+                    <button
+                        onClick={handleConfirmOrder}
+                        className={`btn w-40 btn-primary text-white ${
+                            loading ? "cursor-not-allowed" : "cursor-pointer"
+                        }`}
+                    >
+                        {loading ? (
+                            <span className="loading loading-spinner"></span>
+                        ) : (
+                            <span className="flex items-center justify-center gap-2">
+                                <MdDone size={20} /> Confirm Order
+                            </span>
+                        )}
                     </button>
                 </div>
+                {error && <span className="text-red-500">{error}</span>}
             </div>
         </div>
     );

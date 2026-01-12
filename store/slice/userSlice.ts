@@ -45,25 +45,34 @@ export interface UserState {
 export const initialState: UserState = {
     user: null,
     token: null,
-    loading: false,
+    loading: true,
 };
 
 const userSlice = createSlice({
     name: "user",
     initialState: initialState,
     reducers: {
+        startLoading(state) {
+            state.loading = true;
+        },
+        stopLoading(state) {
+            state.loading = false;
+        },
         setToken(state, action: PayloadAction<string>) {
             state.token = action.payload;
         },
         setUser(state, action: PayloadAction<User>) {
             state.user = action.payload;
+            state.loading = false;
         },
         logout(state) {
             state.user = null;
             state.token = null;
+            state.loading = false;
         },
     },
 });
 
-export const { setToken, setUser, logout } = userSlice.actions;
+export const { startLoading, stopLoading, setToken, setUser, logout } =
+    userSlice.actions;
 export const userReducer = userSlice.reducer;

@@ -1,6 +1,7 @@
 import React from "react";
 import CheckoutPage from "./CheckoutPage";
 import { Metadata } from "next";
+import PrivateRoute from "../components/PrivetRoute";
 
 export const metadata: Metadata = {
     title: "Checkout | My Shop",
@@ -10,7 +11,9 @@ export const metadata: Metadata = {
 const Checkout = () => {
     return (
         <div className="container mx-auto">
-            <CheckoutPage />
+            <PrivateRoute>
+                <CheckoutPage />
+            </PrivateRoute>
         </div>
     );
 };

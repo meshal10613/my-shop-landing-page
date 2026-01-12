@@ -161,6 +161,7 @@ export default function Products({ title }: { title: string }) {
                 addToCartWithCount({
                     count,
                     product: p,
+                    productId: p._id,
                 })
             );
             addToCartRef.current?.close();
@@ -170,7 +171,7 @@ export default function Products({ title }: { title: string }) {
             if (!p) return;
             p.name = cart.name;
             p.category = cart.category;
-            dispatch(addToCheckoutWithCount({ count, product: p }));
+            dispatch(addToCheckoutWithCount({ count, product: p, productId: p._id }));
             router.push("/checkout");
         } else return;
     };
