@@ -11,10 +11,10 @@ export const metadata: Metadata = {
 
 export default function page() {
     return (
-        <>
+        <div className="max-w-324 mx-auto">
             <Banner />
             <ShopProducts />
             <CategoryBottom />
-        </>
+        </div>
     );
 }

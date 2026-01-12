@@ -27,16 +27,17 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+
     return (
         <html lang="en" data-theme="mytheme">
             <body
-                className={`${geistSans.variable} ${geistMono.variable} antialiased max-w-324 mx-auto`}
+                className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >
                 <ReduxProviderWrapper>
-                    <RestoreAuth/>
-                    <AuthLoader/>
+                    <RestoreAuth />
+                    <AuthLoader />
                     <Header />
-                    {children}
+                    <main>{children}</main>
                     <Footer />
                 </ReduxProviderWrapper>
             </body>

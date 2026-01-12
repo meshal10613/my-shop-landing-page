@@ -89,7 +89,7 @@ const CheckoutPage = () => {
                 shippingPrice: "0",
                 mobileNumber: formData.phoneNumber,
                 fullName: formData.fullName,
-                totalAmount: `${subTotal}`,
+                totalAmount: `${grandTotal}`,
                 afterDiscountPrice: `${grandTotal}`,
                 originalProductPrice: `${subTotal}`,
                 couponDiscount: `${subTotal - grandTotal}`,
@@ -103,7 +103,6 @@ const CheckoutPage = () => {
                 },
                 paymentDetails: payment,
             };
-            console.log(paymentData);
             try {
                 const response = await fetch(
                     `https://ecommerce-saas-server-wine.vercel.app/api/v1/order`,
@@ -119,6 +118,27 @@ const CheckoutPage = () => {
 
                 const data = await response.json();
                 if (data.success && data.statusCode === 201) {
+                    for (const item of checkout) {
+                        await dispatch(
+                            removeFromChekout({
+                                _id: item._id,
+                                color: item.attributes.Color,
+                            })
+                        );
+                    }
+                    // checkout.forEach((item) => {
+                    //     dispatch(
+                    //         removeFromChekout({
+                    //             _id: item._id,
+                    //             color: item.attributes.Color,
+                    //         })
+                    //     );
+                    // });
+                    setFormData({
+                        fullName: "",
+                        phoneNumber: "",
+                        address: "",
+                    });
                     Swal.fire({
                         title: "Congratulations!",
                         text: `${data.message}`,

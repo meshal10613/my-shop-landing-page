@@ -35,7 +35,7 @@ export default async function page({ params }: Props) {
     const { id } = await params;
 
     return (
-        <div className="container mx-auto">
+        <div className="container mx-auto max-w-324">
             <ProductDetails id={id} />
             <ProductDescription />
             <AddReview id={id} />

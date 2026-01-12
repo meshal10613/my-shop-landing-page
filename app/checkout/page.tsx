@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 const Checkout = () => {
     return (
-        <div className="container mx-auto">
+        <div className="container max-w-324 mx-auto">
             <PrivateRoute>
                 <CheckoutPage />
             </PrivateRoute>

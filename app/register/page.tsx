@@ -3,7 +3,7 @@ import RegisterPost from "./RegisterUser";
 
 const page = () => {
     return (
-        <div className="container mx-auto">
+        <div className="container max-w-324 mx-auto">
             <RegisterPost />
         </div>
     );
