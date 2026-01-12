@@ -16,6 +16,7 @@ import {
     removeFromChekout,
     removeItemFromCheckout,
 } from "@/store/slice/checkoutSlice";
+import Swal from "sweetalert2";
 
 interface CheckoutFormData {
     fullName: string;
@@ -100,28 +101,36 @@ const CheckoutPage = () => {
                     phone: formData.phoneNumber,
                     note: "",
                 },
+                paymentDetails: payment,
             };
-            console.log(paymentData)
-            // try {
-            //     const response = await fetch(
-            //         `https://ecommerce-saas-server-wine.vercel.app/api/v1/order`,
-            //         {
-            //             method: "POST",
-            //             headers: {
-            //                 "Content-Type": "application/json",
-            //                 "store-id": `0000121`,
-            //             },
-            //             body: JSON.stringify(paymentData),
-            //         }
-            //     );
+            console.log(paymentData);
+            try {
+                const response = await fetch(
+                    `https://ecommerce-saas-server-wine.vercel.app/api/v1/order`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "store-id": `0000121`,
+                        },
+                        body: JSON.stringify(paymentData),
+                    }
+                );
 
-            //     const data = await response.json();
-            //     console.log(data)
-            // } catch (error: any) {
-            //     setError(error.message);
-            // } finally {
-            //     setLoading(false);
-            // }
+                const data = await response.json();
+                if (data.success && data.statusCode === 201) {
+                    Swal.fire({
+                        title: "Congratulations!",
+                        text: `${data.message}`,
+                        icon: "success",
+                        confirmButtonColor: "#3BB77E",
+                    });
+                }
+            } catch (error: any) {
+                setError(error.message);
+            } finally {
+                setLoading(false);
+            }
         }
     };
 

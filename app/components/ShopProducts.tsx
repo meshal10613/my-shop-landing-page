@@ -136,7 +136,7 @@ export default function ShopProducts() {
             if (!p) return;
             p.name = cart.name;
             p.category = cart.category;
-            dispatch(addToCheckoutWithCount({ count, product: p, productId: p._id }));
+            dispatch(addToCheckoutWithCount({ count, product: p, productId: cart._id }));
             router.push("/checkout");
         } else return;
     };
