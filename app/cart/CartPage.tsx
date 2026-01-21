@@ -26,7 +26,7 @@ const Cart = () => {
     const handleAddToCheckout = () => {
         cart.map((item) =>
             dispatch(
-                addToCheckoutWithCount({ count: item.count, product: item })
+                addToCheckoutWithCount({ count: item.count, product: item, productId: item._id })
             )
         );
         router.push("/checkout");
